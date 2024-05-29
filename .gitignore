@@ -1,0 +1,124 @@
+# Common
+.DS_Store
+Thumbs.db
+*.log
+
+# Node.js (Front-End)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/dist
+/build
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Front-End
+/public/static
+/public/assets
+/public/build
+/.next
+/out
+.next
+out
+
+# React Native
+.expo
+.expo-shared
+web-build/
+
+# VSCode settings
+.vscode/
+.idea/
+*.code-workspace
+
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ASP.NET Core (Back-End)
+/bin/
+/obj/
+/out/
+*.pdb
+*.exe
+*.dll
+*.log
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
+
+# Visual Studio
+.vscode/
+.vscode-test/
+.vs/
+.vscode/settings.json
+
+# Test output
+TestResults/
+Coverage/
+coverage/
+
+# Python (AI/ML)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.ipynb_checkpoints
+
+# Jupyter Notebooks
+*.ipynb
+.ipynb_checkpoints
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+override.tf
+override.tf.json
+*.terraformrc
+*.kitchen/
+.kitchen/
+
+# Ignore secrets managed by the terraform command line tool
+**/terraform.tfstate
+**/terraform.tfstate.backup
+
+# Ignore secrets managed by the terraform command line tool
+**/tfplan
+**/tfplan.json
+
+# Ansible
+.cache/
+.ansible/
+
+# Azure
+azure-pipelines.yml
+!azure-pipelines.yml
+
+# GitHub Actions
+.github/workflows/*
+
+# Local History for IntelliJ
+.localhistory/
+
+# Temporary files
+*.tmp
+*.temp
