@@ -1,6 +1,5 @@
 // src/components/AppLayout.js
 
-import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Avatar, Drawer, List, ListItem, ListItemIcon, ListItemText, CssBaseline, Divider, Button } from '@mui/material';
 import { Menu as MenuIcon, AccountCircle, Dashboard, ExitToApp } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
