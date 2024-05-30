@@ -1,0 +1,97 @@
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (Mono Auto Generated)
+mono_crash.*
+
+# Mono auto generated files
+mono_crash.*
+
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Files built by Visual Studio
+.vscode
+.vs
+bin
+obj
+out
+*.exe
+*.dll
+*.log
+*.pdb
+*.cache
+*.csproj.user
+
+# Visual Studio 2019/2022 working directory
+.vscode/
+
+# Local history for Visual Studio
+.localhistory/
+
+# Azure Build Pipeline
+!AzurePipelines
+
+# User settings for Rider
+.idea/
+
+# Rider files
+.idea
+*.iml
+
+# Configuration files
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+
+# Certificates
+*.pfx
+*.p12
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# NPM packages
+node_modules/
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Crash reports
+crashlytics/
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Temporary files
+*.temp
+*.tmp
+
+# Others
+*.swp
+*~
+
+# Security
+secrets.json
