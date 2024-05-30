@@ -1,18 +1,23 @@
+// src/App.js
 
-import './App.css';
-
-import LoginButton from './components/LoginButton';
-import LogoutButton from './components/LogoutButton';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import CryptoDashboard from './components/CryptoDashboard';
 import Profile from './components/Profile';
+import AppLayout from './components/AppLayout';
 
-function App() {
-  return (
-    <div className="App">
-      <LoginButton />
-      <LogoutButton />
-      <Profile />
-    </div>
-  );
-}
+const App = () => {
+    return (
+        <Router>
+            <AppLayout>
+                <Routes>
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/dashboard" element={<CryptoDashboard />} />
+                    <Route path="/" element={<CryptoDashboard />} />
+                </Routes>
+            </AppLayout>
+        </Router>
+    );
+};
 
 export default App;
