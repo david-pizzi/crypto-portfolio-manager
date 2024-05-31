@@ -1,0 +1,42 @@
+name: Deploy Development
+
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout GitHub Actions'
+      uses: actions/checkout@v2
+
+    - name: 'Set up Terraform'
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.9
+
+    - name: 'Azure Login'
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Terraform Init'
+      working-directory: ./CryptoPortfolioInfrastructure
+      run: terraform init
+
+    - name: 'Terraform Plan'
+      if: github.event_name == 'pull_request'
+      working-directory: ./CryptoPortfolioInfrastructure
+      run: terraform plan -var="branch=${{ github.ref_name }}"
+
+    - name: 'Terraform Apply'
+      if: github.event_name == 'push'
+      working-directory: ./CryptoPortfolioInfrastructure
+      run: terraform apply -auto-approve -var="branch=${{ github.ref_name }}"
