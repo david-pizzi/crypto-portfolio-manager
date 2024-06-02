@@ -30,14 +30,7 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Ensure Resource Group and Storage Account Exist
-        run: |
-          az group create --name terraform-state-rg --location "uk south" || true
-          az storage account create --name terraformstate --resource-group terraform-state-rg --location "uk south" --sku Standard_LRS || true
-          ACCOUNT_KEY=$(az storage account keys list --resource-group terraform-state-rg --account-name terraformstate --query '[0].value' --output tsv)
-          az storage container create --name terraform-state --account-name terraformstate --account-key $ACCOUNT_KEY || true
-
+          
       - name: "Terraform Init"
         working-directory: ./CryptoPortfolioInfrastructure
         run: terraform init
