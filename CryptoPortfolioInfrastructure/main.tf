@@ -36,7 +36,7 @@ resource "azurerm_cosmosdb_account" "crypto_portfolio" {
 # Storage account
 resource "azurerm_storage_account" "crypto_portfolio" {
   count                   = local.is_main_branch ? 1 : 0
-  name                    = "cryptoportfoliostorageacct"
+  name                    = var.storage_account_name
   resource_group_name     = azurerm_resource_group.crypto_portfolio[0].name
   location                = azurerm_resource_group.crypto_portfolio[0].location
   account_tier            = "Standard"
