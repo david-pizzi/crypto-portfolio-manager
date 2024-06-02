@@ -10,37 +10,44 @@ on:
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: "Terraform"
     runs-on: ubuntu-latest
     env:
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
     steps:
-    - name: 'Checkout GitHub Actions'
-      uses: actions/checkout@v2
+      - name: "Checkout GitHub Actions"
+        uses: actions/checkout@v2
 
-    - name: 'Set up Terraform'
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.0.9
- 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: "Set up Terraform"
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.9
 
-    - name: 'Terraform Init'
-      working-directory: ./CryptoPortfolioInfrastructure
-      run: terraform init
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: 'Terraform Plan'
-      if: github.event_name == 'pull_request'
-      working-directory: ./CryptoPortfolioInfrastructure
-      run: terraform plan -var="branch=${{ github.ref_name }}"
+      - name: Ensure Resource Group and Storage Account Exist
+        run: |
+          az group create --name terraform-state-rg --location "uk south" || true
+          az storage account create --name terraformstate --resource-group terraform-state-rg --location "uk south" --sku Standard_LRS || true
+          ACCOUNT_KEY=$(az storage account keys list --resource-group terraform-state-rg --account-name terraformstate --query '[0].value' --output tsv)
+          az storage container create --name terraform-state --account-name terraformstate --account-key $ACCOUNT_KEY || true
 
-    - name: 'Terraform Apply'
-      if: github.event_name == 'push'
-      working-directory: ./CryptoPortfolioInfrastructure
-      run: terraform apply -auto-approve -var="branch=${{ github.ref_name }}"
+      - name: "Terraform Init"
+        working-directory: ./CryptoPortfolioInfrastructure
+        run: terraform init
+
+      - name: "Terraform Plan"
+        if: github.event_name == 'pull_request'
+        working-directory: ./CryptoPortfolioInfrastructure
+        run: terraform plan -var="branch=${{ github.ref_name }}"
+
+      - name: "Terraform Apply"
+        if: github.event_name == 'push'
+        working-directory: ./CryptoPortfolioInfrastructure
+        run: terraform apply -auto-approve -var="branch=${{ github.ref_name }}"
