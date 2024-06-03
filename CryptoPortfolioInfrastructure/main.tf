@@ -5,7 +5,7 @@ provider "azurerm" {
 locals {
   is_main_branch = var.branch == "main"
   # Shortened base name with random suffix for uniqueness
-  cosmosdb_account_name = "crypto-cosmos-${random_string.cosmosdb_suffix.result}"
+  cosmosdb_account_name = "cryptocdb-${random_string.cosmosdb_suffix.result}"
 }
 
 # Resource group
@@ -36,4 +36,6 @@ resource "azurerm_cosmosdb_account" "crypto_portfolio" {
 resource "random_string" "cosmosdb_suffix" {
   length  = 6
   special = false
+  upper   = false
+  numeric  = true
 }
