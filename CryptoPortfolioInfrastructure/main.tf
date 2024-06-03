@@ -2,149 +2,69 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "crypto-portfolio-rg"
-  location = "North Europe"
+locals {
+  is_main_branch = var.branch == "main"
 }
 
-resource "azurerm_virtual_network" "vnet" {
-  name                = "crypto-portfolio-vnet"
-  address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+# Resource group
+resource "azurerm_resource_group" "crypto_portfolio" {
+  count    = local.is_main_branch ? 1 : 0
+  name     = var.resource_group_name
+  location = var.location
 }
 
-resource "azurerm_subnet" "subnet" {
-  name                 = "crypto-portfolio-subnet"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
-
-resource "azurerm_network_security_group" "nsg" {
-  name                = "crypto-portfolio-nsg"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-}
-
-resource "azurerm_network_security_rule" "nsg_rule" {
-  name                        = "AllowSSH"
-  priority                    = 1001
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "22"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  network_security_group_name = azurerm_network_security_group.nsg.name
-}
-
-resource "azurerm_container_registry" "acr" {
-  name                = "cryptoportfolioacr"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  sku                 = "Basic"
-  admin_enabled       = true
-}
-
-resource "azurerm_kubernetes_cluster" "aks" {
-  name                = "crypto-portfolio-aks"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "cryptoportfolio"
-
-  default_node_pool {
-    name       = "default"
-    node_count = 2
-    vm_size    = "Standard_DS2_v2"
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  network_profile {
-    network_plugin = "azure"
-    network_policy = "azure"
-  }
-}
-
-resource "azurerm_cosmosdb_account" "cosmosdb" {
-  name                = "cryptoportfoliodb"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+# Cosmos DB account
+resource "azurerm_cosmosdb_account" "crypto_portfolio" {
+  name                = "crypto-portfolio-cosmosdb-account"
+  location            = var.location
+  resource_group_name = local.is_main_branch ? azurerm_resource_group.crypto_portfolio[0].name : "local-rg"
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
   consistency_policy {
-    consistency_level = "Session"
+    consistency_level = "BoundedStaleness"
+    max_interval_in_seconds = 10
+    max_staleness_prefix = 200
   }
-
-  capabilities {
-    name = "EnableServerless"
+  geo_location {
+    location          = var.location
+    failover_priority = 0
   }
 }
 
-resource "azurerm_redis_cache" "redis" {
-  name                = "cryptoportfolioredis"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  capacity            = 1
-  family              = "C"
-  sku_name            = "Standard"
+# Additional resources (only deployed if main branch)
+
+# Storage account
+resource "azurerm_storage_account" "crypto_portfolio" {
+  count                   = local.is_main_branch ? 1 : 0
+  name                    = var.storage_account_name
+  resource_group_name     = azurerm_resource_group.crypto_portfolio[0].name
+  location                = azurerm_resource_group.crypto_portfolio[0].location
+  account_tier            = "Standard"
+  account_replication_type = "LRS"
 }
 
-resource "azurerm_application_gateway" "appgw" {
-  name                = "crypto-portfolio-appgw"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+# App Service Plan with consumption tier
+resource "azurerm_app_service_plan" "crypto_portfolio" {
+  count                = local.is_main_branch ? 1 : 0
+  name                 = "crypto-portfolio-appserviceplan"
+  location             = azurerm_resource_group.crypto_portfolio[0].location
+  resource_group_name  = azurerm_resource_group.crypto_portfolio[0].name
+  kind                 = "FunctionApp"
+  reserved             = false
   sku {
-    name     = "Standard_v2"
-    tier     = "Standard_v2"
-    capacity = 2
+    tier     = "Consumption"
+    size     = "Y1"
   }
+}
 
-  gateway_ip_configuration {
-    name      = "appGatewayIpConfig"
-    subnet_id = azurerm_subnet.subnet.id
-  }
-
-  frontend_port {
-    name = "frontendPort"
-    port = 80
-  }
-
-  frontend_ip_configuration {
-    name                 = "appGatewayFrontendIP"
-    public_ip_address_id = azurerm_public_ip.appgw_public_ip.id
-  }
-
-  backend_address_pool {
-    name = "appGatewayBackendPool"
-  }
-
-  http_listener {
-    name                           = "appGatewayHttpListener"
-    frontend_ip_configuration_name = "appGatewayFrontendIP"
-    frontend_port_name             = "frontendPort"
-    protocol                       = "Http"
-  }
-
-  url_path_map {
-    name          = "appGwUrlPathMap"
-    default_backend_address_pool_name = "appGatewayBackendPool"
-    default_backend_http_settings_name = "appGatewayBackendHttpSettings"
-    path_rule {
-      name                       = "defaultRule"
-      paths                      = ["/*"]
-      backend_address_pool_name  = "appGatewayBackendPool"
-      backend_http_settings_name = "appGatewayBackendHttpSettings"
-    }
-  }
-
-  backend_http_settings {
-    name                  = "appGatewayBackendHttpSettings"
-    cookie_based_affinity = "Disabled"
-    port                  = 80
+# App Service
+resource "azurerm_app_service" "crypto_portfolio" {
+  count                = local.is_main_branch ? 1 : 0
+  name                 = "crypto-portfolio-appservice"
+  location             = azurerm_resource_group.crypto_portfolio[0].location
+  resource_group_name  = azurerm_resource_group.crypto_portfolio[0].name
+  app_service_plan_id  = azurerm_app_service_plan.crypto_portfolio[0].id
+  site_config {
+    always_on = false
   }
 }
