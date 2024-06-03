@@ -8,7 +8,6 @@ locals {
 
 # Resource group
 resource "azurerm_resource_group" "crypto_portfolio" {
-  count    = local.is_main_branch ? 1 : 0
   name     = var.resource_group_name
   location = var.location
 }
