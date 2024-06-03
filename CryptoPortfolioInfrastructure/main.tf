@@ -4,6 +4,8 @@ provider "azurerm" {
 
 locals {
   is_main_branch = var.branch == "main"
+  # Shortened base name with random suffix for uniqueness
+  cosmosdb_account_name = "crypto-cosmos-${random_string.cosmosdb_suffix.result}"
 }
 
 # Resource group
@@ -14,15 +16,15 @@ resource "azurerm_resource_group" "crypto_portfolio" {
 
 # Cosmos DB account
 resource "azurerm_cosmosdb_account" "crypto_portfolio" {
-  name                = "crypto-portfolio-cosmosdb-account"
+  name                = local.cosmosdb_account_name
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.crypto_portfolio.name
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
   consistency_policy {
-    consistency_level = "BoundedStaleness"
+    consistency_level       = "BoundedStaleness"
     max_interval_in_seconds = 10
-    max_staleness_prefix = 200
+    max_staleness_prefix    = 200
   }
   geo_location {
     location          = var.location
@@ -30,4 +32,8 @@ resource "azurerm_cosmosdb_account" "crypto_portfolio" {
   }
 }
 
-# Additional resources (only deployed if main branch)
+# Random suffix for Cosmos DB account name to ensure uniqueness
+resource "random_string" "cosmosdb_suffix" {
+  length  = 6
+  special = false
+}
