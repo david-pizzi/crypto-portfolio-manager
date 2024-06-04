@@ -19,7 +19,6 @@ import {
   Menu as MenuIcon,
   AccountBalance,
   AccountCircle,
-  Dashboard,
   ExitToApp,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -60,15 +59,15 @@ const AppLayout = ({ children }) => {
             <>
               <IconButton
                 color="inherit"
-                onClick={() => handleNavigation("/profile")}
+                onClick={() => handleNavigation("/dashboard")}
               >
-                <AccountCircle />
+                <AccountBalance />
               </IconButton>
               <IconButton
                 color="inherit"
-                onClick={() => handleNavigation("/portfolio")}
+                onClick={() => handleNavigation("/profile")}
               >
-                <AccountBalance />
+                <AccountCircle />
               </IconButton>
               <IconButton
                 color="inherit"
@@ -101,7 +100,7 @@ const AppLayout = ({ children }) => {
           <List>
             <ListItem button onClick={() => handleNavigation("/dashboard")}>
               <ListItemIcon>
-                <Dashboard />
+                <AccountBalance />
               </ListItemIcon>
               <ListItemText primary="Dashboard" />
             </ListItem>
@@ -112,14 +111,6 @@ const AppLayout = ({ children }) => {
                   <AccountCircle />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
-              </ListItem>
-            )}
-            {isAuthenticated && (
-              <ListItem button onClick={() => handleNavigation("/portfolio")}>
-                <ListItemIcon>
-                  <AccountBalance />
-                </ListItemIcon>
-                <ListItemText primary="Portfolio" />
               </ListItem>
             )}
             {isAuthenticated && (
