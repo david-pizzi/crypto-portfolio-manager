@@ -11,6 +11,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+// Read CORS settings from configuration
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowConfiguredOrigins",
+        builder => builder
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -32,7 +44,7 @@ builder.Services.AddSingleton<CosmosDbService>(s =>
     return new CosmosDbService(client, builder.Configuration["CosmosDb:DatabaseId"], builder.Configuration["CosmosDb:ContainerId"]);
 });
 
-// Add Swagger
+// Add Swagger services
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CryptoPortfolioBackend", Version = "v1" });
@@ -76,11 +88,13 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseCors("AllowConfiguredOrigins");
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "CryptoPortfolioBackend v1");
-    c.RoutePrefix = "swagger"; // This sets the default URL to /swagger
+    c.RoutePrefix = string.Empty; // This sets the default URL to /
 });
 
 app.MapControllers();
