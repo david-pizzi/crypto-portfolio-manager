@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import {
   Menu as MenuIcon,
+  AccountBalance,
   AccountCircle,
   Dashboard,
   ExitToApp,
@@ -67,7 +68,7 @@ const AppLayout = ({ children }) => {
                 color="inherit"
                 onClick={() => handleNavigation("/portfolio")}
               >
-                <AccountCircle />
+                <AccountBalance />
               </IconButton>
               <IconButton
                 color="inherit"
@@ -116,7 +117,7 @@ const AppLayout = ({ children }) => {
             {isAuthenticated && (
               <ListItem button onClick={() => handleNavigation("/portfolio")}>
                 <ListItemIcon>
-                  <AccountCircle />
+                  <AccountBalance />
                 </ListItemIcon>
                 <ListItemText primary="Portfolio" />
               </ListItem>

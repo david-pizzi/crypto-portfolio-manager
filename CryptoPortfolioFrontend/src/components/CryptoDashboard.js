@@ -7,6 +7,7 @@ import { getCryptoData } from '../services/coinGeckoService';
 const CryptoDashboard = () => {
     const [cryptoData, setCryptoData] = useState([]);
 
+    // Fetch cryptocurrency data on component mount
     useEffect(() => {
         const fetchData = async () => {
             try {

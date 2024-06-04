@@ -13,16 +13,18 @@ const Portfolio = () => {
   const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
   const scope = "openid profile email read:current_user";
 
+  // Fetch data on component mount
   useEffect(() => {
     fetchData();
   }, []);
 
+  // Fetch portfolio data from the API
   const fetchData = async () => {
     try {
       const token = await getAccessTokenSilently({
         authorizationParams: {
-          audience: `${audience}`,
-          scope: `${scope}`,
+          audience,
+          scope,
         },
       });
       const response = await fetch(`${apiBaseUrl}/api/portfolio`, {
@@ -40,12 +42,13 @@ const Portfolio = () => {
     }
   };
 
+  // Handle form submission for adding/updating a portfolio item
   const handleSubmit = async (event) => {
     event.preventDefault();
     const token = await getAccessTokenSilently({
       authorizationParams: {
-        audience: `${audience}`,
-        scope: `${scope}`,
+        audience,
+        scope,
       },
     });
     const method = editingId ? "PUT" : "POST";
@@ -83,6 +86,7 @@ const Portfolio = () => {
     }
   };
 
+  // Handle editing a portfolio item
   const handleEdit = (item) => {
     setCryptoName(item.cryptoName);
     setAmount(item.amount);
@@ -90,11 +94,12 @@ const Portfolio = () => {
     setEditingId(item.id);
   };
 
+  // Handle deleting a portfolio item
   const handleDelete = async (id) => {
     const token = await getAccessTokenSilently({
       authorizationParams: {
-        audience: `${audience}`,
-        scope: `${scope}`,
+        audience,
+        scope,
       },
     });
     try {
