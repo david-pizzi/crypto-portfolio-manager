@@ -1,7 +1,6 @@
-// Models/CryptoPortfolio.cs
 namespace CryptoPortfolioBackend.Models
 {
-    public class CryptoPortfolio
+    public class PortfolioItem
     {
         public string Id { get; set; }
         public string UserId { get; set; }
