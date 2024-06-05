@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Azure.Cosmos;
 using CryptoPortfolioBackend.Repositories;
 using Microsoft.OpenApi.Models;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +74,13 @@ builder.Services.AddSwaggerGen(c =>
             new string[] {}
         }
     });
+});
+
+// Configure Application Insights
+var appInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
+{
+    ConnectionString = appInsightsConnectionString
 });
 
 var app = builder.Build();
