@@ -2,11 +2,9 @@ provider "azurerm" {
   features {}
 }
 
-# Local values
 locals {
   is_main_branch = var.branch == "main"
   common_suffix = random_string.common_suffix.result
-  # Shortened base name with common suffix for uniqueness
   cosmosdb_account_name = "cryptocdb-${local.common_suffix}"
   app_insights_name = "cryptoinst-${local.common_suffix}"
 }
@@ -33,6 +31,23 @@ resource "azurerm_cosmosdb_account" "crypto_portfolio" {
     location          = var.location
     failover_priority = 0
   }
+}
+
+# Cosmos DB database
+resource "azurerm_cosmosdb_sql_database" "crypto_portfolio_db" {
+  name                = "CryptoPortfolioDB"
+  resource_group_name = azurerm_resource_group.crypto_portfolio.name
+  account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
+}
+
+# Cosmos DB container
+resource "azurerm_cosmosdb_sql_container" "crypto_portfolio_container" {
+  name                = "Portfolios"
+  resource_group_name = azurerm_resource_group.crypto_portfolio.name
+  account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
+  database_name       = azurerm_cosmosdb_sql_database.crypto_portfolio_db.name
+  partition_key_path  = "/partitionKey"
+  throughput          = 400
 }
 
 # Application Insights
