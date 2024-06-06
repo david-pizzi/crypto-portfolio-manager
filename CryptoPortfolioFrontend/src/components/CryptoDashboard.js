@@ -2,8 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Card, CardContent, Typography, Grid, Button, Modal, TextField, Box, Pagination } from '@mui/material';
 import { getCryptoData } from '../services/coinGeckoService';
+import CryptoList from './CryptoList';
+import PaginationControls from './PaginationControls';
+import ModalForm from './ModalForm';
+import Header from './Header';
 
 const CryptoDashboard = () => {
     const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
@@ -15,23 +18,29 @@ const CryptoDashboard = () => {
     const [purchasePrice, setPurchasePrice] = useState("");
     const [editingId, setEditingId] = useState(null);
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
+    const [hasMore, setHasMore] = useState(false);
     const [refreshTime, setRefreshTime] = useState(30);
     const [error, setError] = useState(null);
-    const perPage = 10;
+    const [rateLimitError, setRateLimitError] = useState(false);
+    const perPage = 25;
 
     // Fetch crypto data on mount and page change
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { data, total } = await getCryptoData(page, perPage);
+                const { data, hasMore } = await getCryptoData(page, perPage);
                 setCryptoData(data);
-                setTotal(total);
+                setHasMore(hasMore);
                 setRefreshTime(30); // Reset refresh timer
                 setError(null); // Clear any previous errors
             } catch (error) {
-                console.error('Error fetching crypto data', error);
-                setError('Error while fetching data...');
+                if (error.message.includes('Too many requests')) {
+                    setRateLimitError(true);
+                    setTimeout(() => setRateLimitError(false), 10000);
+                } else {
+                    console.error('Error fetching crypto data', error);
+                    setError('Error while fetching data...');
+                }
             }
         };
 
@@ -48,27 +57,17 @@ const CryptoDashboard = () => {
         }
     }, [refreshTime]);
 
-    // Fetch portfolio data if authenticated
-    useEffect(() => {
-        if (isAuthenticated) {
-            const fetchPortfolio = async () => {
-                try {
-                    const token = await getAccessTokenSilently();
-                    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/portfolio`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    });
-                    const data = await response.json();
-                    setPortfolioData(data);
-                } catch (error) {
-                    console.error('Error fetching portfolio data', error);
-                }
-            };
-
-            fetchPortfolio();
+    const handleNextPage = () => {
+        if (hasMore && !rateLimitError) {
+            setPage(page + 1);
         }
-    }, [isAuthenticated, getAccessTokenSilently]);
+    };
+
+    const handlePreviousPage = () => {
+        if (page > 1 && !rateLimitError) {
+            setPage(page - 1);
+        }
+    };
 
     // Open modal to add or edit portfolio item
     const handleAddOrEdit = (crypto) => {
@@ -158,84 +157,31 @@ const CryptoDashboard = () => {
 
     return (
         <div>
-            <Typography variant="h4" gutterBottom>
-                Cryptocurrency Dashboard
-            </Typography>
-            {error && (
-                <Typography variant="body2" color="error" gutterBottom>
-                    {error}
-                </Typography>
-            )}
-            <Typography variant="body2" color="textSecondary" gutterBottom>
-                Data will refresh in {refreshTime} seconds
-            </Typography>
-            <Grid container spacing={3}>
-                {cryptoData.map((crypto) => (
-                    <Grid item xs={12} sm={6} md={4} key={crypto.id}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h5" component="div">
-                                    {crypto.name}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    £{crypto.current_price}
-                                </Typography>
-                                {isAuthenticated && (
-                                    <div>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Portfolio: {portfolioData.find(item => item.cryptoName === crypto.name)?.amount || 0}
-                                        </Typography>
-                                        <Button variant="contained" color="primary" onClick={() => handleAddOrEdit(crypto)}>
-                                            {portfolioData.find(item => item.cryptoName === crypto.name) ? "Edit Portfolio" : "Add to Portfolio"}
-                                        </Button>
-                                        {portfolioData.find(item => item.cryptoName === crypto.name) && (
-                                            <Button variant="contained" color="secondary" onClick={() => handleDelete(portfolioData.find(item => item.cryptoName === crypto.name).id)}>
-                                                Delete from Portfolio
-                                            </Button>
-                                        )}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
-
-            <Box display="flex" justifyContent="center" mt={2}>
-                <Pagination
-                    count={Math.ceil(total / perPage)}
-                    page={page}
-                    onChange={(e, value) => setPage(value)}
-                    color="primary"
-                />
-            </Box>
-
-            <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-                <Box sx={{ padding: '20px', background: 'white', margin: '100px auto', maxWidth: '400px', borderRadius: 1 }}>
-                    <Typography variant="h6" gutterBottom>
-                        {editingId ? `Edit ${selectedCrypto?.name} in Portfolio` : `Add ${selectedCrypto?.name} to Portfolio`}
-                    </Typography>
-                    <TextField
-                        label="Amount"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        label={`Purchase Price (in GBP)`}
-                        value={purchasePrice}
-                        fullWidth
-                        margin="normal"
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                    />
-                    <Button variant="contained" color="primary" onClick={handleSubmit}>
-                        {editingId ? "Update Portfolio" : "Add to Portfolio"}
-                    </Button>
-                </Box>
-            </Modal>
+            <Header error={error} rateLimitError={rateLimitError} refreshTime={refreshTime} />
+            <CryptoList
+                cryptoData={cryptoData}
+                portfolioData={portfolioData}
+                handleAddOrEdit={handleAddOrEdit}
+                handleDelete={handleDelete}
+                isAuthenticated={isAuthenticated}
+            />
+            <PaginationControls
+                page={page}
+                handlePreviousPage={handlePreviousPage}
+                handleNextPage={handleNextPage}
+                hasMore={hasMore}
+                rateLimitError={rateLimitError}
+            />
+            <ModalForm
+                modalOpen={modalOpen}
+                setModalOpen={setModalOpen}
+                selectedCrypto={selectedCrypto}
+                amount={amount}
+                setAmount={setAmount}
+                purchasePrice={purchasePrice}
+                handleSubmit={handleSubmit}
+                editingId={editingId}
+            />
         </div>
     );
 };
