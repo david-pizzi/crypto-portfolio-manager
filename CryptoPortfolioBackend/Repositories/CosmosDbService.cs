@@ -3,33 +3,39 @@ using System.Linq;
 using System.Threading.Tasks;
 using CryptoPortfolioBackend.Models;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CryptoPortfolioBackend.Repositories
 {
     public class CosmosDbService
     {
         private readonly Container _container;
+        private readonly ILogger<CosmosDbService> _logger;
 
-        public CosmosDbService(CosmosClient dbClient, string databaseId, string containerId)
+        public CosmosDbService(CosmosClient dbClient, string databaseId, string containerId, ILogger<CosmosDbService> logger)
         {
             _container = dbClient.GetContainer(databaseId, containerId);
+            _logger = logger;
         }
 
-        public async Task AddItemAsync(PortfolioItem item)
+        public async Task AddItemAsync(PortfolioItem item, string partitionKey)
         {
-            await _container.CreateItemAsync(item, new PartitionKey(item.Id));
+            var json = JsonConvert.SerializeObject(item);
+            _logger.LogInformation("Adding item: {Json}", json);
+            await _container.CreateItemAsync(item, new PartitionKey(partitionKey));
         }
 
-        public async Task DeleteItemAsync(string id)
+        public async Task DeleteItemAsync(string id, string partitionKey)
         {
-            await _container.DeleteItemAsync<PortfolioItem>(id, new PartitionKey(id));
+            await _container.DeleteItemAsync<PortfolioItem>(id, new PartitionKey(partitionKey));
         }
 
-        public async Task<PortfolioItem> GetItemAsync(string id)
+        public async Task<PortfolioItem> GetItemAsync(string id, string partitionKey)
         {
             try
             {
-                ItemResponse<PortfolioItem> response = await _container.ReadItemAsync<PortfolioItem>(id, new PartitionKey(id));
+                ItemResponse<PortfolioItem> response = await _container.ReadItemAsync<PortfolioItem>(id, new PartitionKey(partitionKey));
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -50,9 +56,9 @@ namespace CryptoPortfolioBackend.Repositories
             return results;
         }
 
-        public async Task UpdateItemAsync(string id, PortfolioItem item)
+        public async Task UpdateItemAsync(string id, PortfolioItem item, string partitionKey)
         {
-            await _container.UpsertItemAsync(item, new PartitionKey(id));
+            await _container.UpsertItemAsync(item, new PartitionKey(partitionKey));
         }
     }
 }
