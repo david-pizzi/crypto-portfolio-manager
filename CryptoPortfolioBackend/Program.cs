@@ -42,7 +42,8 @@ builder.Services.AddSingleton<CosmosDbService>(s =>
 {
     var cosmosDbConnectionString = builder.Configuration["CosmosDb:ConnectionString"];
     var client = new CosmosClient(cosmosDbConnectionString);
-    return new CosmosDbService(client, builder.Configuration["CosmosDb:DatabaseId"], builder.Configuration["CosmosDb:ContainerId"]);
+    var logger = s.GetRequiredService<ILogger<CosmosDbService>>();
+    return new CosmosDbService(client, builder.Configuration["CosmosDb:DatabaseId"], builder.Configuration["CosmosDb:ContainerId"], logger);
 });
 
 // Add Swagger services

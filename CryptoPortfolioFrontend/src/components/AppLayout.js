@@ -1,5 +1,6 @@
 // src/components/AppLayout.js
 
+import React, { lazy, Suspense } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -14,17 +15,43 @@ import {
   CssBaseline,
   Divider,
   Button,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Menu as MenuIcon,
   AccountBalance,
   AccountCircle,
   ExitToApp,
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import { styled } from '@mui/system';
 
 const drawerWidth = 240;
+
+const Root = styled('div')({
+  display: 'flex',
+});
+
+const CustomAppBar = styled(AppBar)({
+  zIndex: 1201, // static value for zIndex
+});
+
+const CustomDrawer = styled(Drawer)({
+  width: drawerWidth,
+  flexShrink: 0,
+  '& .MuiDrawer-paper': {
+    width: drawerWidth,
+  },
+});
+
+const Content = styled('main')({
+  flexGrow: 1,
+  padding: '16px', // use static value
+  marginLeft: drawerWidth,
+});
+
+const Profile = lazy(() => import('./Profile'));
+const CryptoDashboard = lazy(() => import('./CryptoDashboard'));
 
 const AppLayout = ({ children }) => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
@@ -40,14 +67,14 @@ const AppLayout = ({ children }) => {
   }
 
   return (
-    <div style={{ display: "flex" }}>
+    <Root>
       <CssBaseline />
-      <AppBar position="fixed" style={{ zIndex: 1400 }}>
+      <CustomAppBar position="fixed">
         <Toolbar>
           <IconButton
             edge="start"
             color="inherit"
-            aria-label="menu"
+            aria-label="open drawer"
             style={{ marginRight: 20 }}
           >
             <MenuIcon />
@@ -59,13 +86,13 @@ const AppLayout = ({ children }) => {
             <>
               <IconButton
                 color="inherit"
-                onClick={() => handleNavigation("/dashboard")}
+                onClick={() => handleNavigation('/dashboard')}
               >
                 <AccountBalance />
               </IconButton>
               <IconButton
                 color="inherit"
-                onClick={() => handleNavigation("/profile")}
+                onClick={() => handleNavigation('/profile')}
               >
                 <AccountCircle />
               </IconButton>
@@ -83,37 +110,26 @@ const AppLayout = ({ children }) => {
             </Button>
           )}
         </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        style={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawerPaper`]: {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-      >
+      </CustomAppBar>
+      <CustomDrawer variant="permanent">
         <Toolbar />
-        <div style={{ overflow: "auto" }}>
-          <List>
-            <ListItem button onClick={() => handleNavigation("/dashboard")}>
-              <ListItemIcon>
-                <AccountBalance />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItem>
-            <Divider />
-            {isAuthenticated && (
-              <ListItem button onClick={() => handleNavigation("/profile")}>
+        <Divider />
+        <List>
+          <ListItem button onClick={() => handleNavigation('/dashboard')}>
+            <ListItemIcon>
+              <AccountBalance />
+            </ListItemIcon>
+            <ListItemText primary="Dashboard" />
+          </ListItem>
+          {isAuthenticated && (
+            <>
+              <Divider />
+              <ListItem button onClick={() => handleNavigation('/profile')}>
                 <ListItemIcon>
                   <AccountCircle />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
               </ListItem>
-            )}
-            {isAuthenticated && (
               <ListItem
                 button
                 onClick={() => logout({ returnTo: window.location.origin })}
@@ -123,15 +139,17 @@ const AppLayout = ({ children }) => {
                 </ListItemIcon>
                 <ListItemText primary="Logout" />
               </ListItem>
-            )}
-          </List>
-        </div>
-      </Drawer>
-      <main style={{ flexGrow: 1, padding: "20px", marginLeft: drawerWidth }}>
+            </>
+          )}
+        </List>
+      </CustomDrawer>
+      <Content>
         <Toolbar />
-        {children}
-      </main>
-    </div>
+        <Suspense fallback={<div>Loading...</div>}>
+          {children}
+        </Suspense>
+      </Content>
+    </Root>
   );
 };
 
