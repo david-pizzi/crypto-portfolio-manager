@@ -1,21 +1,19 @@
 // src/components/ModalForm.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
 
-const ModalForm = ({ open, onClose, onSubmit, crypto, portfolioItem }) => {
-  const [amount, setAmount] = useState(portfolioItem ? portfolioItem.amount : '');
-
+const ModalForm = ({ open, onClose, onSubmit, crypto, portfolioItem, amount, setAmount }) => {
   useEffect(() => {
     if (portfolioItem) {
       setAmount(portfolioItem.amount);
     } else {
       setAmount('');
     }
-  }, [portfolioItem]);
+  }, [portfolioItem, setAmount]);
 
   const handleSubmit = () => {
-    onSubmit(crypto, parseFloat(amount));
+    onSubmit(crypto, amount);
     onClose();
   };
 
