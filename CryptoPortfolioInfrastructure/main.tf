@@ -46,7 +46,7 @@ resource "azurerm_cosmosdb_sql_container" "crypto_portfolio_container" {
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
   account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
   database_name       = azurerm_cosmosdb_sql_database.crypto_portfolio_db.name
-  partition_key_path  = "/partitionKey"
+  partition_key_path  = "/userId"
   throughput          = 400
 }
 
