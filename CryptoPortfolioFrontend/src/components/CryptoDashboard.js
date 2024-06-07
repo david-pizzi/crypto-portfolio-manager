@@ -1,10 +1,8 @@
+// src/components/CryptoDashboard.js
+
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PortfolioOverview from './PortfolioOverview';
-import ModalForm from './ModalForm';
+import CryptoDashboardView from './CryptoDashboardView';
 import { getCryptoData } from '../services/coinGeckoService';
 
 const CryptoDashboard = () => {
@@ -156,125 +154,34 @@ const CryptoDashboard = () => {
     setSelectedCrypto({ ...crypto, portfolioItem });
   };
 
+  const formatNumber = (num) => {
+    return num.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   return (
-    <Box p={3}>
-      <Typography variant="h3" gutterBottom>Dashboard</Typography>
-      {error && (
-        <Typography variant="body2" color="error" gutterBottom>
-          {error}
-        </Typography>
-      )}
-      <PortfolioOverview 
-        portfolioData={portfolioData} 
-        cryptoData={cryptoData} 
-        handleEdit={handleAddOrEdit} 
-        handleDelete={handleDelete} 
-      />
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Balance</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {cryptoData.map((crypto) => {
-              const portfolioItem = portfolioData.find(item => item.cryptoName === crypto.name);
-              return (
-                <TableRow key={crypto.id} onClick={() => handleSelect(crypto)} style={{ cursor: 'pointer' }}>
-                  <TableCell>
-                    <Typography variant="h6">{crypto.name}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">£{crypto.current_price.toFixed(2)}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    {isAuthenticated && (
-                      <Typography variant="body2">
-                        {portfolioItem ? `${portfolioItem.amount} (${(portfolioItem.amount * crypto.current_price).toFixed(2)} GBP)` : '0'}
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {isAuthenticated && (
-                      <Box display="flex" alignItems="center">
-                        <Tooltip title="Edit Portfolio" arrow>
-                          <span>
-                            <IconButton
-                              color="primary"
-                              size="small"
-                              onClick={(e) => { e.stopPropagation(); handleAddOrEdit(crypto.name); }}
-                              aria-label="Edit Portfolio"
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                        <Tooltip title="Delete from Portfolio" arrow>
-                          <span>
-                            <IconButton
-                              color="secondary"
-                              size="small"
-                              onClick={(e) => { e.stopPropagation(); handleDelete(crypto.name); }}
-                              aria-label="Delete from Portfolio"
-                              disabled={!portfolioItem}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      </Box>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <ModalForm
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleModalSubmit}
-        crypto={currentCrypto}
-        portfolioItem={portfolioData.find(item => item.cryptoName === currentCrypto?.name)}
-        amount={amount}
-        setAmount={setAmount}
-      />
-      <Dialog
-        open={confirmDialogOpen}
-        onClose={() => setConfirmDialogOpen(false)}
-      >
-        <DialogTitle>Confirm Edit</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to update {currentCrypto?.name} in your portfolio?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleConfirmEdit} color="primary">Confirm</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete {cryptoToDelete?.name} from your portfolio?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="secondary">Delete</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+    <CryptoDashboardView
+      error={error}
+      portfolioData={portfolioData}
+      cryptoData={cryptoData}
+      handleAddOrEdit={handleAddOrEdit}
+      handleDelete={handleDelete}
+      handleSelect={handleSelect}
+      isAuthenticated={isAuthenticated}
+      modalOpen={modalOpen}
+      setModalOpen={setModalOpen}
+      handleModalSubmit={handleModalSubmit}
+      currentCrypto={currentCrypto}
+      amount={amount}
+      setAmount={setAmount}
+      confirmDialogOpen={confirmDialogOpen}
+      setConfirmDialogOpen={setConfirmDialogOpen}
+      handleConfirmEdit={handleConfirmEdit}
+      deleteDialogOpen={deleteDialogOpen}
+      setDeleteDialogOpen={setDeleteDialogOpen}
+      handleConfirmDelete={handleConfirmDelete}
+      cryptoToDelete={cryptoToDelete}
+      formatNumber={formatNumber}
+    />
   );
 };
 

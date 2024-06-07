@@ -4,7 +4,7 @@ import React from 'react';
 import { Box, Typography, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material.Delete';
 
 const CryptoCard = ({ crypto, portfolioItem, handleAddOrEdit, handleDelete, isAuthenticated, handleSelect }) => {
   return (
@@ -13,11 +13,11 @@ const CryptoCard = ({ crypto, portfolioItem, handleAddOrEdit, handleDelete, isAu
         <Typography variant="h6">{crypto.name}</Typography>
         <Typography variant="body2">£{crypto.current_price.toFixed(2)}</Typography>
         {isAuthenticated && (
-          <Typography variant="body2">Portfolio: {portfolioItem ? `${portfolioItem.amount} (${(portfolioItem.amount * crypto.current_price).toFixed(2)} GBP)` : '0'}</Typography>
+          <Typography variant="body2">Portfolio: {portfolioItem ? `${portfolioItem.amount} (£${(portfolioItem.amount * crypto.current_price).toFixed(2)})` : '0.00'}</Typography>
         )}
       </Box>
       {isAuthenticated && (
-        <Box display="flex" alignItems="center">
+        <Box display="flex" flexDirection="column" alignItems="center">
           <Tooltip title="Add to Portfolio" arrow>
             <span>
               <IconButton
