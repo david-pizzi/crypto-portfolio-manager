@@ -88,7 +88,6 @@ resource "azurerm_linux_function_app" "crypto_function" {
   storage_account_access_key = azurerm_storage_account.crypto_function_sa.primary_access_key
 
   site_config {
-    always_on = true
   }
 
   app_settings = {
