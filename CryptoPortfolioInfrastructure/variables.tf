@@ -21,3 +21,9 @@ variable "storage_account_name" {
   type        = string
   default     = "cryptostr1578"   
 }
+
+variable "common_suffix" {
+  description = "The common suffix to be used. If not provided, a random string will be used."
+  type        = string
+  default     = "e0x2gf"
+}
