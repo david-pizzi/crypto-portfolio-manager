@@ -52,6 +52,15 @@ resource "azurerm_cosmosdb_sql_container" "crypto_portfolio_container" {
   throughput          = 400
 }
 
+resource "azurerm_cosmosdb_sql_container" "crypto_data_container" {
+  name                = "CryptoData"
+  resource_group_name = azurerm_resource_group.crypto_portfolio.name
+  account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
+  database_name       = azurerm_cosmosdb_sql_database.crypto_portfolio_db.name
+  partition_key_path  = "/id"
+  throughput          = 400
+}
+
 # Application Insights
 resource "azurerm_application_insights" "crypto_portfolio" {
   name                = local.app_insights_name
