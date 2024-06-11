@@ -1,3 +1,4 @@
+// src/components/CryptoDashboardView.js
 import React from "react";
 import {
   Box,
@@ -18,11 +19,12 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles"; // Ensure useTheme is imported from '@mui/material/styles'
+import { styled, useTheme } from "@mui/material/styles";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PortfolioOverview from "./PortfolioOverview";
 import ModalForm from "./ModalForm";
+import ChartComponent from "./Chart";
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(3),
@@ -42,6 +44,7 @@ const CryptoDashboardView = ({
   error,
   portfolioData,
   cryptoData,
+  cryptoHistory,
   handleAddOrEdit,
   handleDelete,
   handleSelect,
@@ -61,7 +64,7 @@ const CryptoDashboardView = ({
   cryptoToDelete,
   formatNumber,
 }) => {
-  const theme = useTheme(); // Ensure theme is used
+  const theme = useTheme();
 
   return (
     <Box p={3}>
@@ -83,7 +86,7 @@ const CryptoDashboardView = ({
           bgcolor="background.paper"
           borderRadius={2}
           textAlign="center"
-          boxShadow={theme.shadows[3]} // Use theme.shadows[3] directly
+          boxShadow={theme.shadows[3]}
         >
           <Typography variant="h4">Total Balance</Typography>
           <Typography variant="h2" color="primary" fontWeight="bold">
@@ -120,6 +123,7 @@ const CryptoDashboardView = ({
               {isAuthenticated && (
                 <StyledTableCell>Volume (Balance)</StyledTableCell>
               )}
+              <StyledTableCell>Chart</StyledTableCell>
               {isAuthenticated && <StyledTableCell>Actions</StyledTableCell>}
             </TableRow>
           </TableHead>
@@ -157,6 +161,9 @@ const CryptoDashboardView = ({
                       </Typography>
                     </TableCell>
                   )}
+                  <TableCell>
+                    <ChartComponent data={cryptoHistory[crypto.coinId] || []} />
+                  </TableCell>
                   {isAuthenticated && (
                     <TableCell>
                       <Box display="flex" alignItems="center">
