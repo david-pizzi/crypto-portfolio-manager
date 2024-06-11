@@ -1,9 +1,7 @@
-// src/components/CryptoDashboard.js
-
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import CryptoDashboardView from './CryptoDashboardView';
-import { getCryptoData } from '../services/coinGeckoService';
+import { getCryptoData } from '../services/cryptoService'; // Updated import
 
 const CryptoDashboard = () => {
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
@@ -81,7 +79,7 @@ const CryptoDashboard = () => {
     const body = JSON.stringify({
       cryptoName: currentCrypto.name,
       amount: parseFloat(amount),
-      purchasePrice: parseFloat(currentCrypto.current_price),
+      purchasePrice: parseFloat(currentCrypto.price), // Use 'price' field from Azure function
       userId: user.sub,
     });
 
@@ -155,7 +153,9 @@ const CryptoDashboard = () => {
   };
 
   const formatNumber = (num) => {
-    return num.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return num !== undefined && num !== null
+      ? num.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : '0.00';
   };
 
   return (
@@ -166,7 +166,7 @@ const CryptoDashboard = () => {
       handleAddOrEdit={handleAddOrEdit}
       handleDelete={handleDelete}
       handleSelect={handleSelect}
-      isAuthenticated={isAuthenticated}
+      isAuthenticated={isAuthenticated} // Pass the isAuthenticated prop
       modalOpen={modalOpen}
       setModalOpen={setModalOpen}
       handleModalSubmit={handleModalSubmit}

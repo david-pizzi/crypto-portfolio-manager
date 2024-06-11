@@ -1,5 +1,3 @@
-// src/components/PortfolioOverview.js
-
 import React from 'react';
 import { Box, Typography, Card, CardContent, Grid, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 const PortfolioOverview = ({ portfolioData, cryptoData, handleEdit, handleDelete, formatNumber }) => {
   const totalBalance = portfolioData.reduce((total, item) => {
     const crypto = cryptoData.find(crypto => crypto.name === item.cryptoName);
-    return total + (item.amount * (crypto ? crypto.current_price : 0));
+    return total + (item.amount * (crypto && crypto.price ? crypto.price : 0));
   }, 0);
 
   return (
@@ -31,7 +29,7 @@ const PortfolioOverview = ({ portfolioData, cryptoData, handleEdit, handleDelete
                         Amount: {formatNumber(item.amount)}
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
-                        Value: {crypto ? `£${formatNumber(item.amount * crypto.current_price)}` : 'N/A'}
+                        Value: {crypto && crypto.price ? `£${formatNumber(item.amount * crypto.price)}` : 'N/A'}
                       </Typography>
                     </Box>
                     <Box display="flex" flexDirection="column" alignItems="center">
