@@ -103,7 +103,6 @@ resource "azurerm_linux_function_app" "crypto_function" {
     "FUNCTIONS_EXTENSION_VERSION"            = "~4"
     "APPINSIGHTS_INSTRUMENTATIONKEY"         = azurerm_application_insights.crypto_portfolio.instrumentation_key
     "APPLICATIONINSIGHTS_CONNECTION_STRING"  = azurerm_application_insights.crypto_portfolio.connection_string
-    "WEBSITE_RUN_FROM_PACKAGE"               = "1"
     "FUNCTIONS_WORKER_RUNTIME"               = "dotnet"
     "linux_fx_version"                       = "DOTNET|6.0"
   }
