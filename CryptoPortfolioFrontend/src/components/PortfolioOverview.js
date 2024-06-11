@@ -11,10 +11,6 @@ const PortfolioOverview = ({ portfolioData, cryptoData, handleEdit, handleDelete
 
   return (
     <Box p={2} mb={3} bgcolor="background.paper" borderRadius={2}>
-      <Box mt={3} p={2} mb={3} bgcolor="background.paper" borderRadius={2} textAlign="center" boxShadow={3}>
-        <Typography variant="h4">Total Balance</Typography>
-        <Typography variant="h2" color="primary" fontWeight="bold">£{formatNumber(totalBalance)}</Typography>
-      </Box>
       <Grid container spacing={2}>
         {portfolioData.map(item => {
           const crypto = cryptoData.find(crypto => crypto.name === item.cryptoName);

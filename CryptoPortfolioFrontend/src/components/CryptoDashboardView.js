@@ -46,15 +46,41 @@ const CryptoDashboardView = ({
   cryptoToDelete,
   formatNumber,
 }) => {
+  console.log("isAuthenticated:", isAuthenticated);
+
   return (
     <Box p={3}>
       <Typography variant="h3" gutterBottom align="left">
-        Dashboard
+        Portfolio
       </Typography>
       {error && (
         <Typography variant="body2" color="error" gutterBottom>
           {error}
         </Typography>
+      )}
+      {isAuthenticated && (
+        <Box
+          mt={3}
+          p={2}
+          mb={3}
+          bgcolor="background.paper"
+          borderRadius={2}
+          textAlign="center"
+          boxShadow={3}
+        >
+          <Typography variant="h4">Total Balance</Typography>
+          <Typography variant="h2" color="primary" fontWeight="bold">
+            £
+            {formatNumber(
+              portfolioData.reduce((total, item) => {
+                const crypto = cryptoData.find(
+                  (crypto) => crypto.name === item.cryptoName
+                );
+                return total + item.amount * (crypto ? crypto.price : 0);
+              }, 0)
+            )}
+          </Typography>
+        </Box>
       )}
       {isAuthenticated && (
         <PortfolioOverview
@@ -65,7 +91,7 @@ const CryptoDashboardView = ({
           formatNumber={formatNumber}
         />
       )}
-      <Typography variant="h4" gutterBottom align="left">
+      <Typography variant="h3" gutterBottom align="left">
         Cryptocurrencies
       </Typography>
       <TableContainer component={Paper}>

@@ -1,5 +1,3 @@
-// src/components/ModalForm.js
-
 import React, { useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
 
@@ -23,7 +21,7 @@ const ModalForm = ({ open, onClose, onSubmit, crypto, portfolioItem, amount, set
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={{ padding: '20px', background: 'white', margin: '100px auto', maxWidth: '400px', borderRadius: 1 }}>
+      <Box sx={{ padding: '20px', background: 'white', margin: '100px auto', maxWidth: '400px', borderRadius: 2, boxShadow: 24 }}>
         <Typography variant="h6" gutterBottom>
           {portfolioItem ? `Edit ${crypto.name} in Portfolio` : `Add ${crypto.name} to Portfolio`}
         </Typography>
@@ -34,7 +32,7 @@ const ModalForm = ({ open, onClose, onSubmit, crypto, portfolioItem, amount, set
           fullWidth
           margin="normal"
         />
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
+        <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth>
           {portfolioItem ? "Update Portfolio" : "Add to Portfolio"}
         </Button>
       </Box>
