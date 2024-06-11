@@ -18,10 +18,23 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import { styled, useTheme } from '@mui/material/styles'; // Ensure useTheme is imported from '@mui/material/styles'
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PortfolioOverview from "./PortfolioOverview";
 import ModalForm from "./ModalForm";
+
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[3] || '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)', // Fallback box shadow
+}));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  fontWeight: theme.typography.fontWeightBold,
+  backgroundColor: theme.palette.primary.light,
+  color: theme.palette.common.white,
+}));
 
 const CryptoDashboardView = ({
   error,
@@ -46,7 +59,7 @@ const CryptoDashboardView = ({
   cryptoToDelete,
   formatNumber,
 }) => {
-  console.log("isAuthenticated:", isAuthenticated);
+  const theme = useTheme(); // Ensure theme is used
 
   return (
     <Box p={3}>
@@ -66,7 +79,7 @@ const CryptoDashboardView = ({
           bgcolor="background.paper"
           borderRadius={2}
           textAlign="center"
-          boxShadow={3}
+          boxShadow={theme.shadows[3]} // Use theme.shadows[3] directly
         >
           <Typography variant="h4">Total Balance</Typography>
           <Typography variant="h2" color="primary" fontWeight="bold">
@@ -94,14 +107,14 @@ const CryptoDashboardView = ({
       <Typography variant="h3" gutterBottom align="left">
         Cryptocurrencies
       </Typography>
-      <TableContainer component={Paper}>
+      <StyledTableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Price</TableCell>
-              {isAuthenticated && <TableCell>Volume (Balance)</TableCell>}
-              {isAuthenticated && <TableCell>Actions</TableCell>}
+              <StyledTableCell>Name</StyledTableCell>
+              <StyledTableCell>Price</StyledTableCell>
+              {isAuthenticated && <StyledTableCell>Volume (Balance)</StyledTableCell>}
+              {isAuthenticated && <StyledTableCell>Actions</StyledTableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -180,7 +193,7 @@ const CryptoDashboardView = ({
             })}
           </TableBody>
         </Table>
-      </TableContainer>
+      </StyledTableContainer>
       <ModalForm
         open={modalOpen}
         onClose={() => setModalOpen(false)}
