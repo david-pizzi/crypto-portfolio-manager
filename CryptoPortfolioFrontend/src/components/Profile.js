@@ -1,7 +1,5 @@
-// src/components/Profile.js
-
 import React from 'react';
-import { Typography, Card, CardContent, Avatar } from '@mui/material';
+import { Typography, Card, CardContent, Avatar, Box } from '@mui/material';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const Profile = () => {
@@ -12,15 +10,17 @@ const Profile = () => {
     }
 
     return (
-        <Card>
+        <Card sx={{ maxWidth: 400, margin: 'auto', mt: 5 }}>
             <CardContent>
-                <Avatar alt={user.name} src={user.picture} style={{ width: 100, height: 100, margin: 'auto' }} />
-                <Typography variant="h5" component="div" align="center" style={{ marginTop: 20 }}>
-                    {user.name}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" align="center">
-                    {user.email}
-                </Typography>
+                <Box display="flex" flexDirection="column" alignItems="center">
+                    <Avatar alt={user.name} src={user.picture} sx={{ width: 100, height: 100 }} />
+                    <Typography variant="h5" component="div" align="center" sx={{ mt: 2 }}>
+                        {user.name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" align="center">
+                        {user.email}
+                    </Typography>
+                </Box>
             </CardContent>
         </Card>
     );

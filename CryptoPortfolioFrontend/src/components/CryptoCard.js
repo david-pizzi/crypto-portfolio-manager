@@ -1,15 +1,13 @@
-// src/components/CryptoCard.js
-
 import React from 'react';
 import { Box, Typography, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material.Delete';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const CryptoCard = ({ crypto, portfolioItem, handleAddOrEdit, handleDelete, isAuthenticated, handleSelect }) => {
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between" p={2} borderBottom="1px solid gray">
-      <Box onClick={() => handleSelect(crypto)} style={{ cursor: 'pointer' }}>
+      <Box onClick={() => handleSelect(crypto)} sx={{ cursor: 'pointer' }}>
         <Typography variant="h6">{crypto.name}</Typography>
         <Typography variant="body2">£{crypto.current_price.toFixed(2)}</Typography>
         {isAuthenticated && (

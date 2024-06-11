@@ -36,7 +36,9 @@ namespace CryptoFunctionApp.Functions
                 results.AddRange(response.ToList());
             }
 
-            return new OkObjectResult(results);
+            var jsonResponse = new OkObjectResult(results);
+            req.HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*"); // Add CORS header
+            return jsonResponse;
         }
     }
 }

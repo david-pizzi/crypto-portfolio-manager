@@ -1,5 +1,3 @@
-// src/components/AppLayout.js
-
 import React, { lazy, Suspense } from 'react';
 import {
   AppBar,
