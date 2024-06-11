@@ -18,7 +18,7 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
-import { styled, useTheme } from '@mui/material/styles'; // Ensure useTheme is imported from '@mui/material/styles'
+import { styled, useTheme } from "@mui/material/styles"; // Ensure useTheme is imported from '@mui/material/styles'
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PortfolioOverview from "./PortfolioOverview";
@@ -27,7 +27,9 @@ import ModalForm from "./ModalForm";
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(3),
   borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[3] || '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)', // Fallback box shadow
+  boxShadow:
+    theme.shadows[3] ||
+    "0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)", // Fallback box shadow
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -63,12 +65,14 @@ const CryptoDashboardView = ({
 
   return (
     <Box p={3}>
-      <Typography variant="h3" gutterBottom align="left">
-        Portfolio
-      </Typography>
       {error && (
         <Typography variant="body2" color="error" gutterBottom>
           {error}
+        </Typography>
+      )}
+      {isAuthenticated && (
+        <Typography variant="h3" gutterBottom align="left">
+          Portfolio
         </Typography>
       )}
       {isAuthenticated && (
@@ -113,7 +117,9 @@ const CryptoDashboardView = ({
             <TableRow>
               <StyledTableCell>Name</StyledTableCell>
               <StyledTableCell>Price</StyledTableCell>
-              {isAuthenticated && <StyledTableCell>Volume (Balance)</StyledTableCell>}
+              {isAuthenticated && (
+                <StyledTableCell>Volume (Balance)</StyledTableCell>
+              )}
               {isAuthenticated && <StyledTableCell>Actions</StyledTableCell>}
             </TableRow>
           </TableHead>
