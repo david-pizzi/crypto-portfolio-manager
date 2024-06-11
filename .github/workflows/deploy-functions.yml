@@ -23,16 +23,19 @@ jobs:
 
       - name: Install dependencies
         run: dotnet restore
+        working-directory: CryptoFunctionApp  # Adjust the working directory to the folder containing your project
 
       - name: Build the project
         run: dotnet build --configuration Release --no-restore
+        working-directory: CryptoFunctionApp  # Adjust the working directory to the folder containing your project
 
       - name: Publish the project
         run: dotnet publish --configuration Release --no-build --output ./publish
+        working-directory: CryptoFunctionApp  # Adjust the working directory to the folder containing your project
 
       - name: Deploy to Azure Functions
         uses: azure/functions-action@v1
         with:
           app-name: 'cryptofunc-e0x2gf'
-          package: './publish'
+          package: './CryptoFunctionApp/publish'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
