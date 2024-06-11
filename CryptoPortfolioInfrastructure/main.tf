@@ -3,11 +3,11 @@ provider "azurerm" {
 }
 
 locals {
-  is_main_branch = var.branch == "main"
-  common_suffix = var.common_suffix != "" ? var.common_suffix : random_string.common_suffix.result
+  is_main_branch       = var.branch == "main"
+  common_suffix        = var.common_suffix != "" ? var.common_suffix : random_string.common_suffix.result
   cosmosdb_account_name = "cryptocdb-${local.common_suffix}"
-  app_insights_name = "cryptoinst-${local.common_suffix}"
-  function_app_name = "cryptofunc-${local.common_suffix}"
+  app_insights_name    = "cryptoinst-${local.common_suffix}"
+  function_app_name    = "cryptofunc-${local.common_suffix}"
   storage_account_name = "cryptosa${local.common_suffix}"
 }
 
@@ -42,7 +42,7 @@ resource "azurerm_cosmosdb_sql_database" "crypto_portfolio_db" {
   account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
 }
 
-# Cosmos DB container
+# Cosmos DB container for Portfolios
 resource "azurerm_cosmosdb_sql_container" "crypto_portfolio_container" {
   name                = "Portfolios"
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
@@ -52,6 +52,7 @@ resource "azurerm_cosmosdb_sql_container" "crypto_portfolio_container" {
   throughput          = 400
 }
 
+# Cosmos DB container for Crypto Data
 resource "azurerm_cosmosdb_sql_container" "crypto_data_container" {
   name                = "CryptoData"
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
@@ -103,6 +104,7 @@ resource "azurerm_linux_function_app" "crypto_function" {
     "FUNCTIONS_EXTENSION_VERSION"            = "~4"
     "APPINSIGHTS_INSTRUMENTATIONKEY"         = azurerm_application_insights.crypto_portfolio.instrumentation_key
     "APPLICATIONINSIGHTS_CONNECTION_STRING"  = azurerm_application_insights.crypto_portfolio.connection_string
+    "CosmosDBConnectionString"               = azurerm_cosmosdb_account.crypto_portfolio.primary_connection_string
     "FUNCTIONS_WORKER_RUNTIME"               = "dotnet"
     "linux_fx_version"                       = "DOTNET|6.0"
   }
