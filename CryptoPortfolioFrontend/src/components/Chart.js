@@ -18,7 +18,7 @@ const Chart = ({ data }) => {
     }
 
     const chartData = {
-        labels: data.map(d => new Date(d.timestamp).toLocaleDateString()),
+        labels: data.map(d => new Date(d.timestamp).toLocaleDateString() + " " + new Date(d.timestamp).toLocaleTimeString()),
         datasets: [
             {
                 label: 'Price',
@@ -41,8 +41,7 @@ const Chart = ({ data }) => {
                 callbacks: {
                     label: function (context) {
                         const price = context.parsed.y.toFixed(3);
-                        const date = context.parsed.x;
-                        return `Date: ${date}\nPrice: £${price}`;
+                        return `Price: £${price}`;
                     }
                 }
             },
