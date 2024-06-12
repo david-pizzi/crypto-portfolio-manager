@@ -105,6 +105,7 @@ resource "azurerm_linux_function_app" "crypto_function" {
     "APPINSIGHTS_INSTRUMENTATIONKEY"         = azurerm_application_insights.crypto_portfolio.instrumentation_key
     "APPLICATIONINSIGHTS_CONNECTION_STRING"  = azurerm_application_insights.crypto_portfolio.connection_string
     "CosmosDBConnectionString"               = azurerm_cosmosdb_account.crypto_portfolio.primary_readonly_sql_connection_string
+    "IntervalMinutes"                        = "15"
     "FUNCTIONS_WORKER_RUNTIME"               = "dotnet"
     "linux_fx_version"                       = "DOTNET|6.0"
   }

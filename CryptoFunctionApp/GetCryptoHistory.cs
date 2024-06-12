@@ -27,8 +27,15 @@ namespace CryptoFunctionApp.Functions
             var cosmosClient = new CosmosClient(CosmosConnectionString);
             var container = cosmosClient.GetContainer(DatabaseId, ContainerId);
 
-            var query = new QueryDefinition("SELECT * FROM c WHERE c.coinId = @coinId ORDER BY c.timestamp DESC")
-                .WithParameter("@coinId", coinId);
+            var now = DateTime.UtcNow;
+            var twentyFourHoursAgo = now.AddHours(-24);
+
+            // Define SQL query
+            var queryText = "SELECT * FROM c WHERE c.coinId = @coinId AND c.timestamp >= @twentyFourHoursAgo ORDER BY c.timestamp ASC";
+            var query = new QueryDefinition(queryText)
+                .WithParameter("@coinId", coinId)
+                .WithParameter("@twentyFourHoursAgo", twentyFourHoursAgo);
+
             var iterator = container.GetItemQueryIterator<CryptoData>(query);
 
             var results = new List<CryptoData>();

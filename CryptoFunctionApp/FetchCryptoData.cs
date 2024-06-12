@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
@@ -17,60 +18,84 @@ namespace CryptoFunctionApp.Functions
         private static readonly string CosmosConnectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
         private static readonly string DatabaseId = "CryptoPortfolioDB";
         private static readonly string ContainerId = "CryptoData";
+        private static readonly int IntervalMinutes = int.TryParse(Environment.GetEnvironmentVariable("IntervalMinutes"), out var interval) ? interval : 15;
 
         [FunctionName("FetchCryptoData")]
         public static async Task Run([TimerTrigger("* */15 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            log.LogInformation($"Interval set to: {IntervalMinutes} minutes");
 
             var cosmosClient = new CosmosClient(CosmosConnectionString);
-            var database = await cosmosClient.CreateDatabaseIfNotExistsAsync(DatabaseId);
-            var container = await database.Database.CreateContainerIfNotExistsAsync(ContainerId, "/id");
+            var container = cosmosClient.GetContainer(DatabaseId, ContainerId);
 
-            try
+            var response = await httpClient.GetAsync(CryptoCompareApiUrl);
+
+            if (!response.IsSuccessStatusCode)
             {
-                var response = await httpClient.GetAsync(CryptoCompareApiUrl);
+                var errorContent = await response.Content.ReadAsStringAsync();
+                log.LogError($"Error fetching data: {response.StatusCode} - {response.ReasonPhrase}. Content: {errorContent}");
+                return;
+            }
 
-                if (response.IsSuccessStatusCode)
+            var content = await response.Content.ReadAsStringAsync();
+            var cryptoCompareResponse = JsonConvert.DeserializeObject<CryptoCompareResponse>(content);
+
+            foreach (var element in cryptoCompareResponse.Data)
+            {
+                var coinId = element.CoinInfo.Id;
+                log.LogInformation($"Processing coin: {coinId}");
+
+                try
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var cryptoCompareResponse = JsonConvert.DeserializeObject<CryptoCompareResponse>(content);
-                    var cryptoList = new List<CryptoData>();
+                    // Use LINQ to get the most recent entry for the current coin
+                    var latestCryptoData = container.GetItemLinqQueryable<CryptoData>(true)
+                        .Where(c => c.CoinId == coinId)
+                        .OrderByDescending(c => c.Timestamp)
+                        .AsEnumerable()
+                        .FirstOrDefault();
 
-                    foreach (var element in cryptoCompareResponse.Data)
+                    if (latestCryptoData != null)
                     {
-                        var id = $"{element.CoinInfo.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}";
-                        var cryptoData = new CryptoData
-                        {
-                            Id = id,
-                            CoinId = element.CoinInfo.Id,
-                            Name = element.CoinInfo.Name,
-                            Symbol = element.CoinInfo.FullName,
-                            Price = element.Raw.Gbp.Price,
-                            Timestamp = DateTime.UtcNow
-                        };
+                        log.LogInformation($"Latest entry for {coinId} found with timestamp: {latestCryptoData.Timestamp}");
 
-                        cryptoList.Add(cryptoData);
-                        log.LogInformation($"Attempting to upsert item with ID: {id}");
-                        await container.Container.UpsertItemAsync(cryptoData, new PartitionKey(id));
+                        if ((DateTime.UtcNow - latestCryptoData.Timestamp).TotalMinutes < IntervalMinutes)
+                        {
+                            log.LogInformation($"Skipping entry for {coinId} as the last entry is within {IntervalMinutes} minutes.");
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        log.LogInformation($"No previous entry found for {coinId}");
                     }
 
-                    log.LogInformation($"Data fetched and stored at: {DateTime.Now}");
+                    var now = DateTime.UtcNow;
+                    var id = $"{coinId}_{now:yyyyMMddHHmm}";
+                    var cryptoData = new CryptoData
+                    {
+                        Id = id,
+                        CoinId = coinId,
+                        Name = element.CoinInfo.Name,
+                        Symbol = element.CoinInfo.FullName,
+                        Price = element.Raw.Gbp.Price,
+                        Timestamp = now
+                    };
+
+                    log.LogInformation($"Attempting to upsert item with ID: {id}");
+                    await container.UpsertItemAsync(cryptoData, new PartitionKey(id));
                 }
-                else
+                catch (CosmosException ex)
                 {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    log.LogError($"Error fetching data: {response.StatusCode} - {response.ReasonPhrase}. Content: {errorContent}");
+                    log.LogError($"CosmosException during query: {ex.StatusCode} - {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    log.LogError($"Exception: {ex.Message}");
                 }
             }
-            catch (CosmosException ex)
-            {
-                log.LogError($"CosmosException: {ex.StatusCode} - {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                log.LogError($"Exception: {ex.Message}");
-            }
+
+            log.LogInformation($"Data fetched and stored at: {DateTime.UtcNow}");
         }
 
         public class CryptoCompareResponse
