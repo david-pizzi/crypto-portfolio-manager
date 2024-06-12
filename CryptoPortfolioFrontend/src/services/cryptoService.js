@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const AZURE_FUNCTION_URL = process.env.REACT_APP_AZURE_FUNCTION_URL;
 const AZURE_FUNCTION_CODE = process.env.REACT_APP_AZURE_FUNCTION_CODE;
+const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3';
 
 export const getCryptoData = async () => {
     try {
@@ -23,6 +24,25 @@ export const getCryptoHistory = async (coinId) => {
         return response.data;
     } catch (error) {
         console.error('Error fetching crypto history', error);
+        throw error;
+    }
+};
+
+export const getCryptoImages = async () => {
+    try {
+        const response = await axios.get(`${COINGECKO_API_URL}/coins/markets`, {
+            params: {
+                vs_currency: 'GBP',
+            }
+        });
+        return response.data.map(crypto => ({
+            id: crypto.id,
+            name: crypto.name,
+            symbol: crypto.symbol,
+            image: crypto.image
+        }));
+    } catch (error) {
+        console.error('Error fetching data from CoinGecko API', error);
         throw error;
     }
 };

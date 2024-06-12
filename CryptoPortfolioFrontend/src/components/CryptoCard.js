@@ -1,63 +1,45 @@
 import React from 'react';
-import { Box, Typography, IconButton, Tooltip } from '@mui/material';
+import { Box, Typography, IconButton, Tooltip, Card, CardContent } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const CryptoCard = ({ crypto, portfolioItem, handleAddOrEdit, handleDelete, isAuthenticated, handleSelect }) => {
+const CryptoCard = ({ item, crypto, handleEdit, handleDelete, formatNumber }) => {
   return (
-    <Box display="flex" alignItems="center" justifyContent="space-between" p={2} borderBottom="1px solid gray">
-      <Box onClick={() => handleSelect(crypto)} sx={{ cursor: 'pointer' }}>
-        <Typography variant="h6">{crypto.name}</Typography>
-        <Typography variant="body2">£{crypto.current_price.toFixed(2)}</Typography>
-        {isAuthenticated && (
-          <Typography variant="body2">Portfolio: {portfolioItem ? `${portfolioItem.amount} (£${(portfolioItem.amount * crypto.current_price).toFixed(2)})` : '0.00'}</Typography>
-        )}
-      </Box>
-      {isAuthenticated && (
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <Tooltip title="Add to Portfolio" arrow>
-            <span>
-              <IconButton
-                color="primary"
-                size="small"
-                onClick={() => handleAddOrEdit(crypto)}
-                aria-label="Add to Portfolio"
-                disabled={!!portfolioItem}
-              >
-                <AddIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Edit Portfolio" arrow>
-            <span>
-              <IconButton
-                color="primary"
-                size="small"
-                onClick={() => handleAddOrEdit(crypto)}
-                aria-label="Edit Portfolio"
-                disabled={!portfolioItem}
+    <Card>
+      <CardContent>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography variant="h6" gutterBottom>{item.cryptoName}</Typography>
+            <Typography variant="body1">
+              Amount: {formatNumber(item.amount)}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Value: {crypto && crypto.price ? `£${formatNumber(item.amount * crypto.price)}` : 'N/A'}
+            </Typography>
+          </Box>
+          <Box display="flex" flexDirection="column" alignItems="center">
+            <Tooltip title="Edit" arrow>
+              <IconButton 
+                color="primary" 
+                size="small" 
+                onClick={() => handleEdit(item.cryptoName)}
               >
                 <EditIcon />
               </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Delete from Portfolio" arrow>
-            <span>
-              <IconButton
-                color="secondary"
-                size="small"
-                onClick={handleDelete}
-                aria-label="Delete from Portfolio"
-                disabled={!portfolioItem}
+            </Tooltip>
+            <Tooltip title="Delete" arrow>
+              <IconButton 
+                color="secondary" 
+                size="small" 
+                onClick={() => handleDelete(item.cryptoName)}
               >
                 <DeleteIcon />
               </IconButton>
-            </span>
-          </Tooltip>
+            </Tooltip>
+          </Box>
         </Box>
-      )}
-    </Box>
+      </CardContent>
+    </Card>
   );
 };
 
