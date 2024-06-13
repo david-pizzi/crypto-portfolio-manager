@@ -24,7 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { styled } from '@mui/system';
 
-const drawerWidth = 240;
+const drawerWidth = 200; // Reduced drawer width
 
 const Root = styled('div')({
   display: 'flex',
@@ -44,8 +44,9 @@ const CustomDrawer = styled(Drawer)({
 
 const Content = styled('main')({
   flexGrow: 1,
-  padding: '16px', // use static value
-  marginLeft: drawerWidth,
+  padding: '8px', // Reduced padding
+  marginLeft: 50, // Set left margin
+  marginRight: 50, // Set right margin
 });
 
 const Profile = lazy(() => import('./Profile'));

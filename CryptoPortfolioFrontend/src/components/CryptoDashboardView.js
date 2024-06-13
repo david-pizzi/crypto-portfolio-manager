@@ -26,7 +26,7 @@ import ModalForm from "./ModalForm";
 import ChartComponent from "./Chart";
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(3),
+  marginTop: theme.spacing(1), // Reduced marginTop
   borderRadius: theme.shape.borderRadius,
   boxShadow:
     theme.shadows[3] ||
@@ -67,7 +67,7 @@ const CryptoDashboardView = ({
   const theme = useTheme();
 
   return (
-    <Box p={3}>
+    <Box p={1}> {/* Reduced padding */}
       {error && (
         <Typography variant="body2" color="error" gutterBottom>
           {error}
@@ -80,13 +80,13 @@ const CryptoDashboardView = ({
       )}
       {isAuthenticated && (
         <Box
-          mt={3}
-          mb={3}
+          mt={1}
+          mb={1}
           bgcolor="background.paper"
           borderRadius={2}
           textAlign="center"
           boxShadow={theme.shadows[3]}
-          p={2}
+          p={1}
           display="flex"
           flexDirection="column"
           alignItems="center"
