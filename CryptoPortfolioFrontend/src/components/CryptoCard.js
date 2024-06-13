@@ -8,22 +8,24 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 const CryptoCard = ({ item, crypto, cryptoImage, handleEdit, handleDelete, formatNumber }) => {
   return (
     <Card sx={{ display: 'flex', alignItems: 'center', p: 1, m: 1, maxWidth: 350 }}>
-      <CardContent sx={{ flex: '1 0 auto', p: 1 }}>
-        <Typography component="div" variant="h6">{crypto.symbol} ({item.cryptoName})</Typography>
-        <Typography variant="body2" color="textSecondary">
-          Amount: {formatNumber(item.amount)} {crypto && crypto.price ? `(£${formatNumber(item.amount * crypto.price)})` : '(N/A)'}
-        </Typography>
-      </CardContent>
       {cryptoImage && (
-        <CardMedia sx={{ width: 80, height: 80, ml: 1 }}>
+        <CardMedia sx={{ width: 75, height: 75, mr: 2 }}>
           <LazyLoadImage
             src={cryptoImage.image}
             alt={item.cryptoName}
             effect="blur"
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: '75px', height: '75px' }}
           />
         </CardMedia>
       )}
+      <CardContent sx={{ flex: '1 0 auto', p: 0 }}>
+        <Typography component="div" variant="h6" sx={{ width: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {crypto.symbol} ({item.cryptoName})
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Amount: {formatNumber(item.amount)} {crypto && crypto.price ? `(£${formatNumber(item.amount * crypto.price)})` : '(N/A)'}
+        </Typography>
+      </CardContent>
       <CardActions sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 0 }}>
         <Tooltip title="Edit" arrow>
           <IconButton color="primary" size="small" onClick={() => handleEdit(item.cryptoName)}>
