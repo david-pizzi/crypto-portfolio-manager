@@ -117,6 +117,19 @@ resource "azurerm_linux_function_app" "crypto_function" {
   ]
 }
 
+# New Storage Account for Static Website
+resource "azurerm_storage_account" "crypto_static_website_sa" {
+  name                     = "cryptoweb${local.common_suffix}"
+  resource_group_name      = azurerm_resource_group.crypto_portfolio.name
+  location                 = var.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  static_website {
+    index_document = "index.html"
+    error_404_document = "index.html"
+  }
+}
+
 # Random string for unique naming
 resource "random_string" "common_suffix" {
   length  = 6
