@@ -13,8 +13,7 @@ import {
   CssBaseline,
   Divider,
   Button,
-  Box, // Import Box component for layout
-  Alert, // Import Alert component for warning alert
+  Alert,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -50,9 +49,6 @@ const Content = styled('main')({
   marginLeft: 50, // Set left margin
   marginRight: 50, // Set right margin
 });
-
-const Profile = lazy(() => import('./Profile'));
-const CryptoDashboard = lazy(() => import('./CryptoDashboard'));
 
 const AppLayout = ({ children }) => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
