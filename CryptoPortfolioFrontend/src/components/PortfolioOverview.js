@@ -1,60 +1,40 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, Grid, IconButton, Tooltip } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Box } from '@mui/material';
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import CryptoCard from './CryptoCard'; // Import the CryptoCard component
 
-const PortfolioOverview = ({ portfolioData, cryptoData, handleEdit, handleDelete, formatNumber }) => {
-  const totalBalance = portfolioData.reduce((total, item) => {
-    const crypto = cryptoData.find(crypto => crypto.name === item.cryptoName);
-    return total + (item.amount * (crypto && crypto.price ? crypto.price : 0));
-  }, 0);
-
+const PortfolioOverview = ({ portfolioData, cryptoData, cryptoImages, handleEdit, handleDelete, formatNumber }) => {
   return (
-    <Box p={2} mb={3} bgcolor="background.paper" borderRadius={2}>
-      <Grid container spacing={2}>
+    <Box p={2} bgcolor="background.paper" borderRadius={2} sx={{ maxWidth: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+      <Carousel
+        showThumbs
+        showIndicators
+        infiniteLoop
+        centerMode
+        autoPlay
+        centerSlidePercentage={33}
+        emulateTouch
+        style={{ maxWidth: '100%' }}
+      >
         {portfolioData.map(item => {
-          const crypto = cryptoData.find(crypto => crypto.name === item.cryptoName);
+          const crypto = cryptoData.find(crypto => crypto.name.toLowerCase() === item.cryptoName.toLowerCase());
+          const cryptoImage = cryptoImages.find(img => img.symbol.toLowerCase() === item.cryptoName.toLowerCase());
           return (
-            <Grid item xs={12} md={6} lg={4} key={item.cryptoName}>
-              <Card>
-                <CardContent>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Box>
-                      <Typography variant="h6" gutterBottom>{item.cryptoName}</Typography>
-                      <Typography variant="body1">
-                        Amount: {formatNumber(item.amount)}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Value: {crypto && crypto.price ? `£${formatNumber(item.amount * crypto.price)}` : 'N/A'}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" flexDirection="column" alignItems="center">
-                      <Tooltip title="Edit" arrow>
-                        <IconButton 
-                          color="primary" 
-                          size="small" 
-                          onClick={() => handleEdit(item.cryptoName)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete" arrow>
-                        <IconButton 
-                          color="secondary" 
-                          size="small" 
-                          onClick={() => handleDelete(item.cryptoName)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+            <div key={item.cryptoName} style={{ padding: '0 15px', boxSizing: 'border-box', display: 'flex', justifyContent: 'center' }}>
+              <CryptoCard
+                item={item}
+                crypto={crypto}
+                cryptoImage={cryptoImage}
+                handleEdit={handleEdit}
+                handleDelete={handleDelete}
+                formatNumber={formatNumber}
+                style={{ maxWidth: '100%' }}
+              />
+            </div>
           );
         })}
-      </Grid>
+      </Carousel>
     </Box>
   );
 };

@@ -1,4 +1,3 @@
-// src/components/CryptoDashboardView.js
 import React from "react";
 import {
   Box,
@@ -27,7 +26,7 @@ import ModalForm from "./ModalForm";
 import ChartComponent from "./Chart";
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(3),
+  marginTop: theme.spacing(1), // Reduced marginTop
   borderRadius: theme.shape.borderRadius,
   boxShadow:
     theme.shadows[3] ||
@@ -45,6 +44,7 @@ const CryptoDashboardView = ({
   portfolioData,
   cryptoData,
   cryptoHistory,
+  cryptoImages,
   handleAddOrEdit,
   handleDelete,
   handleSelect,
@@ -67,7 +67,7 @@ const CryptoDashboardView = ({
   const theme = useTheme();
 
   return (
-    <Box p={3}>
+    <Box p={1}> {/* Reduced padding */}
       {error && (
         <Typography variant="body2" color="error" gutterBottom>
           {error}
@@ -80,13 +80,16 @@ const CryptoDashboardView = ({
       )}
       {isAuthenticated && (
         <Box
-          mt={3}
-          p={2}
-          mb={3}
+          mt={1}
+          mb={1}
           bgcolor="background.paper"
           borderRadius={2}
           textAlign="center"
           boxShadow={theme.shadows[3]}
+          p={1}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
         >
           <Typography variant="h4">Total Balance</Typography>
           <Typography variant="h2" color="primary" fontWeight="bold">
@@ -94,7 +97,7 @@ const CryptoDashboardView = ({
             {formatNumber(
               portfolioData.reduce((total, item) => {
                 const crypto = cryptoData.find(
-                  (crypto) => crypto.name === item.cryptoName
+                  (crypto) => crypto.name.toLowerCase() === item.cryptoName.toLowerCase()
                 );
                 return total + item.amount * (crypto ? crypto.price : 0);
               }, 0)
@@ -106,6 +109,7 @@ const CryptoDashboardView = ({
         <PortfolioOverview
           portfolioData={portfolioData}
           cryptoData={cryptoData}
+          cryptoImages={cryptoImages}
           handleEdit={handleAddOrEdit}
           handleDelete={handleDelete}
           formatNumber={formatNumber}
@@ -130,7 +134,10 @@ const CryptoDashboardView = ({
           <TableBody>
             {cryptoData.map((crypto) => {
               const portfolioItem = portfolioData.find(
-                (item) => item.cryptoName === crypto.name
+                (item) => item.cryptoName.toLowerCase() === crypto.name.toLowerCase()
+              );
+              const cryptoImage = cryptoImages.find(
+                (img) => img.symbol.toLowerCase() === crypto.name.toLowerCase()
               );
               return (
                 <TableRow
@@ -139,9 +146,18 @@ const CryptoDashboardView = ({
                   style={{ cursor: "pointer" }}
                 >
                   <TableCell>
-                    <Typography variant="h6">
-                      {crypto.name} ({crypto.symbol.toUpperCase()})
-                    </Typography>
+                    <Box display="flex" alignItems="center">
+                      {cryptoImage && (
+                        <img
+                          src={cryptoImage.image}
+                          alt={crypto.name}
+                          style={{ width: 32, height: 32, marginRight: 8 }}
+                        />
+                      )}
+                      <Typography variant="h6">
+                        {crypto.name} ({crypto.symbol.toUpperCase()})
+                      </Typography>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
@@ -213,7 +229,7 @@ const CryptoDashboardView = ({
         onSubmit={handleModalSubmit}
         crypto={currentCrypto}
         portfolioItem={portfolioData.find(
-          (item) => item.cryptoName === currentCrypto?.name
+          (item) => item.cryptoName.toLowerCase() === currentCrypto?.name.toLowerCase()
         )}
         amount={amount}
         setAmount={setAmount}

@@ -1,63 +1,32 @@
 import React from 'react';
-import { Box, Typography, IconButton, Tooltip } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Card, CardContent, CardMedia, CardActions, Typography, Button } from '@mui/material';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
-const CryptoCard = ({ crypto, portfolioItem, handleAddOrEdit, handleDelete, isAuthenticated, handleSelect }) => {
+const CryptoCard = ({ item, crypto, cryptoImage, handleEdit, handleDelete, formatNumber, style }) => {
   return (
-    <Box display="flex" alignItems="center" justifyContent="space-between" p={2} borderBottom="1px solid gray">
-      <Box onClick={() => handleSelect(crypto)} sx={{ cursor: 'pointer' }}>
-        <Typography variant="h6">{crypto.name}</Typography>
-        <Typography variant="body2">£{crypto.current_price.toFixed(2)}</Typography>
-        {isAuthenticated && (
-          <Typography variant="body2">Portfolio: {portfolioItem ? `${portfolioItem.amount} (£${(portfolioItem.amount * crypto.current_price).toFixed(2)})` : '0.00'}</Typography>
-        )}
-      </Box>
-      {isAuthenticated && (
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <Tooltip title="Add to Portfolio" arrow>
-            <span>
-              <IconButton
-                color="primary"
-                size="small"
-                onClick={() => handleAddOrEdit(crypto)}
-                aria-label="Add to Portfolio"
-                disabled={!!portfolioItem}
-              >
-                <AddIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Edit Portfolio" arrow>
-            <span>
-              <IconButton
-                color="primary"
-                size="small"
-                onClick={() => handleAddOrEdit(crypto)}
-                aria-label="Edit Portfolio"
-                disabled={!portfolioItem}
-              >
-                <EditIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Delete from Portfolio" arrow>
-            <span>
-              <IconButton
-                color="secondary"
-                size="small"
-                onClick={handleDelete}
-                aria-label="Delete from Portfolio"
-                disabled={!portfolioItem}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Box>
+    <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1, m: 1, width: '100%', maxWidth: 350, bgcolor: '#4791db3d', margin: '0 auto', ...style }}>
+      <CardContent sx={{ flex: '1 0 auto', p: 1 }}>
+        <Typography component="div" variant="h6">{crypto.symbol} ({item.cryptoName})</Typography>
+        <Typography variant="body2" color="textSecondary">
+          Amount: {formatNumber(item.amount)} {crypto && crypto.price ? `(£${formatNumber(item.amount * crypto.price)})` : '(N/A)'}
+        </Typography>
+      </CardContent>
+      {cryptoImage && (
+        <CardMedia sx={{ width: 80, height: 80, mt: 1 }}>
+          <LazyLoadImage
+            src={cryptoImage.image}
+            alt={item.cryptoName}
+            effect="blur"
+            style={{ width: '100%', height: '100%' }}
+          />
+        </CardMedia>
       )}
-    </Box>
+      <CardActions sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 1 }}>
+        <Button variant="outlined" size="small" onClick={() => handleEdit(item.cryptoName)}>Edit</Button>
+        <Button variant="contained" color="secondary" size="small" onClick={() => handleDelete(item.cryptoName)}>Delete</Button>
+      </CardActions>
+    </Card>
   );
 };
 

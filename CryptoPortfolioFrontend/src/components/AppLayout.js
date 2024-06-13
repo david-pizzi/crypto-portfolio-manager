@@ -13,6 +13,8 @@ import {
   CssBaseline,
   Divider,
   Button,
+  Box, // Import Box component for layout
+  Alert, // Import Alert component for warning alert
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -24,7 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { styled } from '@mui/system';
 
-const drawerWidth = 240;
+const drawerWidth = 200; // Reduced drawer width
 
 const Root = styled('div')({
   display: 'flex',
@@ -44,8 +46,9 @@ const CustomDrawer = styled(Drawer)({
 
 const Content = styled('main')({
   flexGrow: 1,
-  padding: '16px', // use static value
-  marginLeft: drawerWidth,
+  padding: '8px', // Reduced padding
+  marginLeft: 50, // Set left margin
+  marginRight: 50, // Set right margin
 });
 
 const Profile = lazy(() => import('./Profile'));
@@ -143,6 +146,10 @@ const AppLayout = ({ children }) => {
       </CustomDrawer>
       <Content>
         <Toolbar />
+        {/* Disclaimer Alert */}
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          <strong>Disclaimer:</strong> This is a demonstrator application for educational purposes only. While cryptocurrency prices are fetched from genuine APIs, no real cryptocurrency purchases or transactions are being conducted. Please do not consider any data or information displayed as financial advice.
+        </Alert>
         <Suspense fallback={<div>Loading...</div>}>
           {children}
         </Suspense>
