@@ -10,7 +10,7 @@ const CryptoDashboard = () => {
     const [cryptoHistory, setCryptoHistory] = useState({});
     const [cryptoImages, setCryptoImages] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedCrypto, setSelectedCrypto] = useState(null);
+    const [setSelectedCrypto] = useState(null);
     const [currentCrypto, setCurrentCrypto] = useState(null);
     const [error, setError] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
