@@ -1,14 +1,14 @@
-// src/components/CryptoDashboard.js
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import CryptoDashboardView from './CryptoDashboardView';
-import { getCryptoData, getCryptoHistory } from '../services/cryptoService';
+import { getCryptoData, getCryptoHistory, getCryptoImages } from '../services/cryptoService';
 
 const CryptoDashboard = () => {
     const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
     const [cryptoData, setCryptoData] = useState([]);
     const [portfolioData, setPortfolioData] = useState([]);
     const [cryptoHistory, setCryptoHistory] = useState({});
+    const [cryptoImages, setCryptoImages] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCrypto, setSelectedCrypto] = useState(null);
     const [currentCrypto, setCurrentCrypto] = useState(null);
@@ -17,15 +17,20 @@ const CryptoDashboard = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [cryptoToDelete, setCryptoToDelete] = useState(null);
     const [amount, setAmount] = useState("");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const { data } = await getCryptoData();
+                const images = await getCryptoImages();
                 setCryptoData(data);
+                setCryptoImages(images);
             } catch (error) {
                 console.error('Error fetching crypto data', error);
                 setError('Error while fetching data...');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -68,9 +73,9 @@ const CryptoDashboard = () => {
     }, [cryptoData]);
 
     const handleAddOrEdit = (cryptoName) => {
-        const crypto = cryptoData.find(c => c.name === cryptoName);
+        const crypto = cryptoData.find(c => c.name.toLowerCase() === cryptoName.toLowerCase());
         setCurrentCrypto(crypto);
-        const existingItem = portfolioData.find(item => item.cryptoName === cryptoName);
+        const existingItem = portfolioData.find(item => item.cryptoName.toLowerCase() === cryptoName.toLowerCase());
         setAmount(existingItem ? existingItem.amount : "");
         setModalOpen(true);
     };
@@ -86,7 +91,7 @@ const CryptoDashboard = () => {
 
     const handleConfirmEdit = async () => {
         const token = await getAccessTokenSilently();
-        const existingItem = portfolioData.find(item => item.cryptoName === currentCrypto.name);
+        const existingItem = portfolioData.find(item => item.cryptoName.toLowerCase() === currentCrypto.name.toLowerCase());
         const method = existingItem ? 'PUT' : 'POST';
         const url = existingItem
             ? `${process.env.REACT_APP_API_BASE_URL}/api/portfolio/${existingItem.id}`
@@ -95,7 +100,7 @@ const CryptoDashboard = () => {
         const body = JSON.stringify({
             cryptoName: currentCrypto.name,
             amount: parseFloat(amount),
-            purchasePrice: parseFloat(currentCrypto.price), // Use 'price' field from Azure function
+            purchasePrice: parseFloat(currentCrypto.price),
             userId: user.sub,
         });
 
@@ -109,7 +114,6 @@ const CryptoDashboard = () => {
                 body,
             });
 
-            // Fetch updated portfolio data
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/portfolio`, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -118,7 +122,6 @@ const CryptoDashboard = () => {
             const updatedPortfolio = await response.json();
             setPortfolioData(updatedPortfolio);
 
-            // Close modal and reset form
             setModalOpen(false);
             setCurrentCrypto(null);
         } catch (error) {
@@ -129,14 +132,14 @@ const CryptoDashboard = () => {
     };
 
     const handleDelete = (cryptoName) => {
-        const crypto = cryptoData.find(c => c.name === cryptoName);
+        const crypto = cryptoData.find(c => c.name.toLowerCase() === cryptoName.toLowerCase());
         setCryptoToDelete(crypto);
         setDeleteDialogOpen(true);
     };
 
     const handleConfirmDelete = async () => {
         const token = await getAccessTokenSilently();
-        const existingItem = portfolioData.find(item => item.cryptoName === cryptoToDelete.name);
+        const existingItem = portfolioData.find(item => item.cryptoName.toLowerCase() === cryptoToDelete.name.toLowerCase());
 
         if (!existingItem) return;
 
@@ -148,7 +151,6 @@ const CryptoDashboard = () => {
                 }
             });
 
-            // Fetch updated portfolio data
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/portfolio`, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -164,7 +166,7 @@ const CryptoDashboard = () => {
     };
 
     const handleSelect = (crypto) => {
-        const portfolioItem = portfolioData.find(item => item.cryptoName === crypto.name);
+        const portfolioItem = portfolioData.find(item => item.cryptoName.toLowerCase() === crypto.name.toLowerCase());
         setSelectedCrypto({ ...crypto, portfolioItem });
     };
 
@@ -174,16 +176,21 @@ const CryptoDashboard = () => {
             : '0.00';
     };
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <CryptoDashboardView
             error={error}
             portfolioData={portfolioData}
             cryptoData={cryptoData}
             cryptoHistory={cryptoHistory}
+            cryptoImages={cryptoImages}
             handleAddOrEdit={handleAddOrEdit}
             handleDelete={handleDelete}
             handleSelect={handleSelect}
-            isAuthenticated={isAuthenticated} // Pass the isAuthenticated prop
+            isAuthenticated={isAuthenticated}
             modalOpen={modalOpen}
             setModalOpen={setModalOpen}
             handleModalSubmit={handleModalSubmit}

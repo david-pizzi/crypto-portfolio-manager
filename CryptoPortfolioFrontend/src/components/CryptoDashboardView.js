@@ -1,4 +1,3 @@
-// src/components/CryptoDashboardView.js
 import React from "react";
 import {
   Box,
@@ -45,6 +44,7 @@ const CryptoDashboardView = ({
   portfolioData,
   cryptoData,
   cryptoHistory,
+  cryptoImages,
   handleAddOrEdit,
   handleDelete,
   handleSelect,
@@ -94,7 +94,7 @@ const CryptoDashboardView = ({
             {formatNumber(
               portfolioData.reduce((total, item) => {
                 const crypto = cryptoData.find(
-                  (crypto) => crypto.name === item.cryptoName
+                  (crypto) => crypto.name.toLowerCase() === item.cryptoName.toLowerCase()
                 );
                 return total + item.amount * (crypto ? crypto.price : 0);
               }, 0)
@@ -106,6 +106,7 @@ const CryptoDashboardView = ({
         <PortfolioOverview
           portfolioData={portfolioData}
           cryptoData={cryptoData}
+          cryptoImages={cryptoImages}
           handleEdit={handleAddOrEdit}
           handleDelete={handleDelete}
           formatNumber={formatNumber}
@@ -130,7 +131,10 @@ const CryptoDashboardView = ({
           <TableBody>
             {cryptoData.map((crypto) => {
               const portfolioItem = portfolioData.find(
-                (item) => item.cryptoName === crypto.name
+                (item) => item.cryptoName.toLowerCase() === crypto.name.toLowerCase()
+              );
+              const cryptoImage = cryptoImages.find(
+                (img) => img.symbol.toLowerCase() === crypto.name.toLowerCase()
               );
               return (
                 <TableRow
@@ -139,9 +143,18 @@ const CryptoDashboardView = ({
                   style={{ cursor: "pointer" }}
                 >
                   <TableCell>
-                    <Typography variant="h6">
-                      {crypto.name} ({crypto.symbol.toUpperCase()})
-                    </Typography>
+                    <Box display="flex" alignItems="center">
+                      {cryptoImage && (
+                        <img
+                          src={cryptoImage.image}
+                          alt={crypto.name}
+                          style={{ width: 32, height: 32, marginRight: 8 }}
+                        />
+                      )}
+                      <Typography variant="h6">
+                        {crypto.name} ({crypto.symbol.toUpperCase()})
+                      </Typography>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
@@ -213,7 +226,7 @@ const CryptoDashboardView = ({
         onSubmit={handleModalSubmit}
         crypto={currentCrypto}
         portfolioItem={portfolioData.find(
-          (item) => item.cryptoName === currentCrypto?.name
+          (item) => item.cryptoName.toLowerCase() === currentCrypto?.name.toLowerCase()
         )}
         amount={amount}
         setAmount={setAmount}
