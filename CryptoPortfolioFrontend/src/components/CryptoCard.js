@@ -5,7 +5,7 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const CryptoCard = ({ item, crypto, cryptoImage, handleEdit, handleDelete, formatNumber, style }) => {
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1, m: 1, width: '100%', maxWidth: 350, bgcolor: '#4791db3d', ...style }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1, m: 1, width: '100%', maxWidth: 350, bgcolor: '#4791db3d', margin: '0 auto', ...style }}>
       <CardContent sx={{ flex: '1 0 auto', p: 1 }}>
         <Typography component="div" variant="h6">{crypto.symbol} ({item.cryptoName})</Typography>
         <Typography variant="body2" color="textSecondary">

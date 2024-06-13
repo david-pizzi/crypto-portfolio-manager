@@ -81,12 +81,15 @@ const CryptoDashboardView = ({
       {isAuthenticated && (
         <Box
           mt={3}
-          p={2}
           mb={3}
           bgcolor="background.paper"
           borderRadius={2}
           textAlign="center"
           boxShadow={theme.shadows[3]}
+          p={2}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
         >
           <Typography variant="h4">Total Balance</Typography>
           <Typography variant="h2" color="primary" fontWeight="bold">

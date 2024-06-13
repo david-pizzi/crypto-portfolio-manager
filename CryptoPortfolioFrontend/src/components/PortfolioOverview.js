@@ -6,7 +6,7 @@ import CryptoCard from './CryptoCard'; // Import the CryptoCard component
 
 const PortfolioOverview = ({ portfolioData, cryptoData, cryptoImages, handleEdit, handleDelete, formatNumber }) => {
   return (
-    <Box p={2} mb={3} bgcolor="background.paper" borderRadius={2} sx={{ maxWidth: '100%', overflow: 'hidden' }}>
+    <Box p={2} mb={3} bgcolor="background.paper" borderRadius={2} sx={{ maxWidth: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
       <Carousel
         showThumbs
         showIndicators
@@ -15,12 +15,13 @@ const PortfolioOverview = ({ portfolioData, cryptoData, cryptoImages, handleEdit
         autoPlay
         centerSlidePercentage={33}
         emulateTouch
+        style={{ maxWidth: '100%' }}
       >
         {portfolioData.map(item => {
           const crypto = cryptoData.find(crypto => crypto.name.toLowerCase() === item.cryptoName.toLowerCase());
           const cryptoImage = cryptoImages.find(img => img.symbol.toLowerCase() === item.cryptoName.toLowerCase());
           return (
-            <div key={item.cryptoName} style={{ padding: '0 15px', boxSizing: 'border-box' }}>
+            <div key={item.cryptoName} style={{ padding: '0 15px', boxSizing: 'border-box', display: 'flex', justifyContent: 'center' }}>
               <CryptoCard
                 item={item}
                 crypto={crypto}
