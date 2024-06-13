@@ -13,6 +13,8 @@ import {
   CssBaseline,
   Divider,
   Button,
+  Box, // Import Box component for layout
+  Alert, // Import Alert component for warning alert
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -144,6 +146,10 @@ const AppLayout = ({ children }) => {
       </CustomDrawer>
       <Content>
         <Toolbar />
+        {/* Disclaimer Alert */}
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          <strong>Disclaimer:</strong> This is a demonstrator application for educational purposes only. While cryptocurrency prices are fetched from genuine APIs, no real cryptocurrency purchases or transactions are being conducted. Please do not consider any data or information displayed as financial advice.
+        </Alert>
         <Suspense fallback={<div>Loading...</div>}>
           {children}
         </Suspense>
