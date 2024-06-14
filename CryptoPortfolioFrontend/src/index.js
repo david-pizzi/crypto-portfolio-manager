@@ -1,3 +1,5 @@
+// src/index.js
+import config from './config';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
@@ -5,11 +7,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 
+const domain = config.REACT_APP_AUTH0_DOMAIN;
+const clientId = config.REACT_APP_AUTH0_CLIENT_ID;
+const audience = config.REACT_APP_AUTH0_AUDIENCE;
+const scope = config.REACT_APP_AUTH0_SCOPE;
+
 const root = createRoot(document.getElementById('root'));
-const domain = process.env.REACT_APP_AUTH0_DOMAIN;
-const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
-const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
-const scope = process.env.REACT_APP_AUTH0_SCOPE;
 
 const shadows = [
   'none',

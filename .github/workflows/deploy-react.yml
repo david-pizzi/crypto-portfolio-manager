@@ -26,6 +26,11 @@ jobs:
     - name: Build React app
       run: npm run build
       working-directory: ./CryptoPortfolioFrontend
+
+    - name: Replace tokens
+      uses: cschleiden/replace-tokens@v1.3
+      with:
+        files: './CryptoPortfolioFrontend/build/**/*.js'
       env:
         REACT_APP_AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
         REACT_APP_AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}

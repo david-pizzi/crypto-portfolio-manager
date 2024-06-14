@@ -1,8 +1,9 @@
 // src/services/cryptoService.js
+import config from '../config';
 import axios from 'axios';
 
-const AZURE_FUNCTION_URL = process.env.REACT_APP_AZURE_FUNCTION_URL;
-const AZURE_FUNCTION_CODE = process.env.REACT_APP_AZURE_FUNCTION_CODE;
+const AZURE_FUNCTION_URL = config.REACT_APP_AZURE_FUNCTION_URL;
+const AZURE_FUNCTION_CODE = config.REACT_APP_AZURE_FUNCTION_CODE;
 const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3';
 
 export const getCryptoData = async () => {
