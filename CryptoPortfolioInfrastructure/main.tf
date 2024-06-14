@@ -15,7 +15,7 @@ locals {
   app_service_plan_function_name = "crypto-function-plan-${local.common_suffix}"
   app_service_plan_container_name = "cryptoappserviceplan-${local.common_suffix}"
   app_service_container_name  = "cryptoapp-${local.common_suffix}"
-  container_registry_name     = "cryptoacr-${local.common_suffix}"
+  container_registry_name     = "cryptoacr${local.common_suffix}"
 }
 
 # Resource group
@@ -105,6 +105,12 @@ resource "azurerm_linux_function_app" "crypto_function" {
   storage_account_access_key = azurerm_storage_account.crypto_function_sa.primary_access_key
 
   site_config {
+    cors {
+      allowed_origins = [
+        azurerm_storage_account.crypto_static_website_sa.primary_web_endpoint,
+        "http://localhost:3000"
+      ]
+    }
   }
 
   app_settings = {
@@ -145,8 +151,6 @@ resource "random_string" "common_suffix" {
   numeric = true
 }
 
-# New resources for containerized deployment
-
 # Azure Container Registry
 resource "azurerm_container_registry" "crypto_portfolio" {
   name                = local.container_registry_name
@@ -157,17 +161,12 @@ resource "azurerm_container_registry" "crypto_portfolio" {
 }
 
 # Azure App Service Plan for Containers
-resource "azurerm_app_service_plan" "crypto_portfolio_container" {
+resource "azurerm_service_plan" "crypto_portfolio_container" {
   name                = local.app_service_plan_container_name
   location            = azurerm_resource_group.crypto_portfolio.location
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
-  kind                = "Linux"
-  reserved            = true
-
-  sku {
-    tier = "Basic"
-    size = "B1"
-  }
+  os_type             = "Linux"
+  sku_name            = "B1"
 }
 
 # Azure App Service for Containers
@@ -175,8 +174,17 @@ resource "azurerm_app_service" "crypto_portfolio_container" {
   name                = local.app_service_container_name
   location            = azurerm_resource_group.crypto_portfolio.location
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
-  app_service_plan_id = azurerm_app_service_plan.crypto_portfolio_container.id
+  app_service_plan_id = azurerm_service_plan.crypto_portfolio_container.id
 
+  site_config {
+    cors {
+      allowed_origins = [
+        azurerm_storage_account.crypto_static_website_sa.primary_web_endpoint,
+        "http://localhost:3000"
+      ]
+    }
+  }
+  
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
     DOCKER_REGISTRY_SERVER_URL          = "https://${azurerm_container_registry.crypto_portfolio.login_server}"
@@ -196,7 +204,7 @@ resource "azurerm_app_service" "crypto_portfolio_container" {
     AUTH0__AUDIENCE                      = var.auth0_audience
 
     # CosmosDb
-    COSMOSDB__CONNECTIONSTRING           = azurerm_cosmosdb_account.crypto_portfolio.connection_strings[0]
+    COSMOSDB__CONNECTIONSTRING           = azurerm_cosmosdb_account.crypto_portfolio.primary_readonly_sql_connection_string
     COSMOSDB__DATABASEID                 = azurerm_cosmosdb_sql_database.crypto_portfolio_db.name
     COSMOSDB__CONTAINERID                = azurerm_cosmosdb_sql_container.crypto_portfolio_container.name
 
