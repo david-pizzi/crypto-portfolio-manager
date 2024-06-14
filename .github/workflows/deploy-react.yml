@@ -3,7 +3,8 @@ name: Build and Deploy React App to Azure
 on:
   push:
     paths:
-      - "CryptoPortfolioFrontend/**" # Adjust the folder path as needed
+      - "CryptoPortfolioFrontend/**"
+      - ".github/workflows/deploy-react.yml"
 
 jobs:
   build:
@@ -25,6 +26,14 @@ jobs:
     - name: Build React app
       run: npm run build
       working-directory: ./CryptoPortfolioFrontend
+      env:
+        REACT_APP_AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+        REACT_APP_AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+        REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
+        REACT_APP_AUTH0_SCOPE: ${{ secrets.REACT_APP_AUTH0_SCOPE }}
+        REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
+        REACT_APP_AZURE_FUNCTION_URL: ${{ secrets.REACT_APP_AZURE_FUNCTION_URL }}
+        REACT_APP_AZURE_FUNCTION_CODE: ${{ secrets.REACT_APP_AZURE_FUNCTION_CODE }}
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
