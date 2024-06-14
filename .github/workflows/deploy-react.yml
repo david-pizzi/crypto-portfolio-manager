@@ -26,6 +26,8 @@ jobs:
     - name: Build React app
       run: npm run build
       working-directory: ./CryptoPortfolioFrontend
+      env:
+        NODE_ENV: production
 
     - name: Replace tokens
       uses: cschleiden/replace-tokens@v1.3
