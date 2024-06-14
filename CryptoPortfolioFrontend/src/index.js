@@ -8,8 +8,8 @@ import App from './App';
 const root = createRoot(document.getElementById('root'));
 const domain = process.env.REACT_APP_AUTH0_DOMAIN;
 const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
-const audience = process.env.AUTH0_AUDIENCE;
-const scope = process.env.AUTH0_SCOPE;
+const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
+const scope = process.env.REACT_APP_AUTH0_SCOPE;
 
 const shadows = [
   'none',

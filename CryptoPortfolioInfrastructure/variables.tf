@@ -16,14 +16,18 @@ variable "location" {
   default     = "UK South"
 }
 
-variable "storage_account_name" {
-   description = "The name of the storage account"
-  type        = string
-  default     = "cryptostr1578"   
-}
-
 variable "common_suffix" {
   description = "The common suffix to be used. If not provided, a random string will be used."
   type        = string
-  default     = "e0x2gf"
+  default     = ""
+}
+
+variable "auth0_domain" {
+  description = "The Auth0 domain"
+  type        = string
+}
+
+variable "auth0_audience" {
+  description = "The Auth0 audience"
+  type        = string
 }

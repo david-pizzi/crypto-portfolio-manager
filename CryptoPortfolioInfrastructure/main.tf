@@ -3,12 +3,19 @@ provider "azurerm" {
 }
 
 locals {
-  is_main_branch       = var.branch == "main"
-  common_suffix        = var.common_suffix != "" ? var.common_suffix : random_string.common_suffix.result
-  cosmosdb_account_name = "cryptocdb-${local.common_suffix}"
-  app_insights_name    = "cryptoinst-${local.common_suffix}"
-  function_app_name    = "cryptofunc-${local.common_suffix}"
-  storage_account_name = "cryptosa${local.common_suffix}"
+  common_suffix              = var.common_suffix != "" ? var.common_suffix : random_string.common_suffix.result
+  cosmosdb_account_name      = "cryptocdb-${local.common_suffix}"
+  app_insights_name          = "cryptoinst-${local.common_suffix}"
+  function_app_name          = "cryptofunc-${local.common_suffix}"
+  storage_account_name       = "cryptosa${local.common_suffix}"
+  cosmosdb_database_name     = "CryptoPortfolioDB"
+  cosmosdb_container_portfolio_name = "Portfolios"
+  cosmosdb_container_data_name      = "CryptoData"
+  storage_account_website_name = "cryptoweb${local.common_suffix}"
+  app_service_plan_function_name = "crypto-function-plan-${local.common_suffix}"
+  app_service_plan_container_name = "cryptoappserviceplan-${local.common_suffix}"
+  app_service_container_name  = "cryptoapp-${local.common_suffix}"
+  container_registry_name     = "cryptoacr-${local.common_suffix}"
 }
 
 # Resource group
@@ -37,14 +44,14 @@ resource "azurerm_cosmosdb_account" "crypto_portfolio" {
 
 # Cosmos DB database
 resource "azurerm_cosmosdb_sql_database" "crypto_portfolio_db" {
-  name                = "CryptoPortfolioDB"
+  name                = local.cosmosdb_database_name
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
   account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
 }
 
 # Cosmos DB container for Portfolios
 resource "azurerm_cosmosdb_sql_container" "crypto_portfolio_container" {
-  name                = "Portfolios"
+  name                = local.cosmosdb_container_portfolio_name
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
   account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
   database_name       = azurerm_cosmosdb_sql_database.crypto_portfolio_db.name
@@ -54,7 +61,7 @@ resource "azurerm_cosmosdb_sql_container" "crypto_portfolio_container" {
 
 # Cosmos DB container for Crypto Data
 resource "azurerm_cosmosdb_sql_container" "crypto_data_container" {
-  name                = "CryptoData"
+  name                = local.cosmosdb_container_data_name
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
   account_name        = azurerm_cosmosdb_account.crypto_portfolio.name
   database_name       = azurerm_cosmosdb_sql_database.crypto_portfolio_db.name
@@ -70,7 +77,7 @@ resource "azurerm_application_insights" "crypto_portfolio" {
   application_type    = "web"
 }
 
-# Storage Account
+# Storage Account for Function App
 resource "azurerm_storage_account" "crypto_function_sa" {
   name                     = local.storage_account_name
   resource_group_name      = azurerm_resource_group.crypto_portfolio.name
@@ -79,9 +86,9 @@ resource "azurerm_storage_account" "crypto_function_sa" {
   account_replication_type = "LRS"
 }
 
-# Service Plan
+# Service Plan for Function App
 resource "azurerm_service_plan" "crypto_function_plan" {
-  name                = "crypto-function-plan-${local.common_suffix}"
+  name                = local.app_service_plan_function_name
   location            = var.location
   resource_group_name = azurerm_resource_group.crypto_portfolio.name
   os_type             = "Linux"
@@ -117,9 +124,9 @@ resource "azurerm_linux_function_app" "crypto_function" {
   ]
 }
 
-# New Storage Account for Static Website
+# Storage Account for Static Website
 resource "azurerm_storage_account" "crypto_static_website_sa" {
-  name                     = "cryptoweb${local.common_suffix}"
+  name                     = local.storage_account_website_name
   resource_group_name      = azurerm_resource_group.crypto_portfolio.name
   location                 = var.location
   account_tier             = "Standard"
@@ -136,4 +143,67 @@ resource "random_string" "common_suffix" {
   special = false
   upper   = false
   numeric = true
+}
+
+# New resources for containerized deployment
+
+# Azure Container Registry
+resource "azurerm_container_registry" "crypto_portfolio" {
+  name                = local.container_registry_name
+  resource_group_name = azurerm_resource_group.crypto_portfolio.name
+  location            = azurerm_resource_group.crypto_portfolio.location
+  sku                 = "Basic"
+  admin_enabled       = true
+}
+
+# Azure App Service Plan for Containers
+resource "azurerm_app_service_plan" "crypto_portfolio_container" {
+  name                = local.app_service_plan_container_name
+  location            = azurerm_resource_group.crypto_portfolio.location
+  resource_group_name = azurerm_resource_group.crypto_portfolio.name
+  kind                = "Linux"
+  reserved            = true
+
+  sku {
+    tier = "Basic"
+    size = "B1"
+  }
+}
+
+# Azure App Service for Containers
+resource "azurerm_app_service" "crypto_portfolio_container" {
+  name                = local.app_service_container_name
+  location            = azurerm_resource_group.crypto_portfolio.location
+  resource_group_name = azurerm_resource_group.crypto_portfolio.name
+  app_service_plan_id = azurerm_app_service_plan.crypto_portfolio_container.id
+
+  app_settings = {
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    DOCKER_REGISTRY_SERVER_URL          = "https://${azurerm_container_registry.crypto_portfolio.login_server}"
+    DOCKER_REGISTRY_SERVER_USERNAME     = azurerm_container_registry.crypto_portfolio.admin_username
+    DOCKER_REGISTRY_SERVER_PASSWORD     = azurerm_container_registry.crypto_portfolio.admin_password
+
+    # Logging
+    LOGGING__LOGLEVEL__DEFAULT           = "Information"
+    LOGGING__LOGLEVEL__MICROSOFT         = "Warning"
+    LOGGING__LOGLEVEL__MICROSOFT_HOSTING_LIFETIME = "Information"
+
+    # Allowed Hosts
+    ALLOWEDHOSTS                         = "*"
+
+    # Auth0
+    AUTH0__DOMAIN                        = var.auth0_domain
+    AUTH0__AUDIENCE                      = var.auth0_audience
+
+    # CosmosDb
+    COSMOSDB__CONNECTIONSTRING           = azurerm_cosmosdb_account.crypto_portfolio.connection_strings[0]
+    COSMOSDB__DATABASEID                 = azurerm_cosmosdb_sql_database.crypto_portfolio_db.name
+    COSMOSDB__CONTAINERID                = azurerm_cosmosdb_sql_container.crypto_portfolio_container.name
+
+    # CORS
+    CORS__ALLOWEDORIGINS                 = azurerm_storage_account.crypto_static_website_sa.primary_web_endpoint
+
+    # Application Insights
+    APPLICATIONINSIGHTS__CONNECTIONSTRING = azurerm_application_insights.crypto_portfolio.connection_string
+  }
 }
