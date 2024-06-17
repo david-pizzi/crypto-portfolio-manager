@@ -70,3 +70,4 @@ jobs:
       with:
         inlineScript: |
           az storage blob update-batch --pattern "build/*" --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name '$web' --content-cache-control "no-cache, no-store, must-revalidate"
+ 
