@@ -5,6 +5,7 @@ on:
     paths:
       - "CryptoPortfolioFrontend/**"
       - ".github/workflows/deploy-react.yml"
+  workflow_dispatch:
 
 jobs:
   build:
