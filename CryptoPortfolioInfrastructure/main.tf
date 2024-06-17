@@ -105,11 +105,8 @@ resource "azurerm_linux_function_app" "crypto_function" {
   storage_account_access_key = azurerm_storage_account.crypto_function_sa.primary_access_key
 
   site_config {
-    cors {
-      allowed_origins = [
-        azurerm_storage_account.crypto_static_website_sa.primary_web_endpoint,
-        "http://localhost:3000"
-      ]
+    cors { 
+      allowed_origins = ["*"]
     }
   }
 
@@ -178,10 +175,7 @@ resource "azurerm_app_service" "crypto_portfolio_container" {
 
   site_config {
     cors {
-      allowed_origins = [
-        azurerm_storage_account.crypto_static_website_sa.primary_web_endpoint,
-        "http://localhost:3000"
-      ]
+      allowed_origins = ["*"]
     }
   }
   
@@ -209,7 +203,7 @@ resource "azurerm_app_service" "crypto_portfolio_container" {
     COSMOSDB__CONTAINERID                = azurerm_cosmosdb_sql_container.crypto_portfolio_container.name
 
     # CORS
-    CORS__ALLOWEDORIGINS                 = azurerm_storage_account.crypto_static_website_sa.primary_web_endpoint
+    CORS__ALLOWEDORIGINS                 = "*"
 
     # Application Insights
     APPLICATIONINSIGHTS__CONNECTIONSTRING = azurerm_application_insights.crypto_portfolio.connection_string
