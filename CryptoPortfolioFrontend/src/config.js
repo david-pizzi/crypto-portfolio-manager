@@ -13,7 +13,11 @@ const config = {
     REACT_APP_AUTH0_CLIENT_ID: process.env.NODE_ENV === 'production' ? "#{REACT_APP_AUTH0_CLIENT_ID}#" : process.env.REACT_APP_AUTH0_CLIENT_ID,
     REACT_APP_AUTH0_AUDIENCE: process.env.NODE_ENV === 'production' ? "#{REACT_APP_AUTH0_AUDIENCE}#" : process.env.REACT_APP_AUTH0_AUDIENCE,
     REACT_APP_AUTH0_SCOPE: process.env.NODE_ENV === 'production' ? "#{REACT_APP_AUTH0_SCOPE}#" : process.env.REACT_APP_AUTH0_SCOPE,
+<<<<<<< HEAD
     REACT_APP_AZURE_PORTFOLIO_API_URL: process.env.NODE_ENV === 'production' ? "#{REACT_APP_AZURE_PORTFOLIO_API_URL}#" : process.env.REACT_APP_AZURE_PORTFOLIO_API_URL,
+=======
+    REACT_APP_PORTFOLIO_API_BASE_URL: process.env.NODE_ENV === 'production' ? "#{REACT_APP_PORTFOLIO_API_BASE_URL}#" : process.env.REACT_APP_PORTFOLIO_API_BASE_URL,
+>>>>>>> fbeb6a5 (Devops/fix buids (#23))
     REACT_APP_AZURE_FUNCTION_URL: process.env.NODE_ENV === 'production' ? "#{REACT_APP_AZURE_FUNCTION_URL}#" : process.env.REACT_APP_AZURE_FUNCTION_URL,
     REACT_APP_AZURE_FUNCTION_CODE: process.env.NODE_ENV === 'production' ? "#{REACT_APP_AZURE_FUNCTION_CODE}#" : process.env.REACT_APP_AZURE_FUNCTION_CODE,
     /* eslint-enable no-template-curly-in-string */
