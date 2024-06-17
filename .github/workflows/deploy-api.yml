@@ -18,6 +18,9 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v2
 
+      - name: Set working directory
+        run: cd CryptoPortfolioBackend
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
@@ -25,9 +28,11 @@ jobs:
 
       - name: Build the project
         run: dotnet build --configuration Release
+        working-directory: CryptoPortfolioBackend
 
       - name: Publish the project
         run: dotnet publish -c Release -o ./publish
+        working-directory: CryptoPortfolioBackend
 
       - name: Login via Azure CLI
         uses: azure/login@v1
@@ -36,21 +41,23 @@ jobs:
 
       - name: Get ACR credentials
         run: |
-          echo "##[set-output name=USERNAME;]$(az acr credential show --name ${{ secrets.ACR_REGISTRY }} --query username --output tsv)"
-          echo "##[set-output name=PASSWORD;]$(az acr credential show --name ${{ secrets.ACR_REGISTRY }} --query passwords[0].value --output tsv)"
+          echo "##[set-output name=USERNAME;]$(az acr credential show --name ${{ secrets.ACR_REGISTRY_NAME }} --query username --output tsv)"
+          echo "##[set-output name=PASSWORD;]$(az acr credential show --name ${{ secrets.ACR_REGISTRY_NAME }} --query passwords[0].value --output tsv)"
         id: get-acr-credentials
 
       - name: Login to Azure Container Registry
         run: |
-          echo "${{ steps.get-acr-credentials.outputs.PASSWORD }}" | docker login ${{ secrets.ACR_REGISTRY }} -u ${{ steps.get-acr-credentials.outputs.USERNAME }} --password-stdin
+          echo "${{ steps.get-acr-credentials.outputs.PASSWORD }}" | docker login ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io -u ${{ steps.get-acr-credentials.outputs.USERNAME }} --password-stdin
+        working-directory: CryptoPortfolioBackend
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
-          docker push ${{ secrets.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker build -t ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest .
+          docker push ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+        working-directory: CryptoPortfolioBackend
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_PORTFOLIO_API_NAME }}
-          images: "${{ secrets.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          images: "${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest"
