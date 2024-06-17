@@ -3,10 +3,8 @@ name: Build and Deploy Azure Functions
 on:
   push:
     paths:
-      - 'CryptoFunctionApp/**'  # Adjust the folder path as needed
-  pull_request:
-    paths:
-      - 'CryptoFunctionApp/**'  # Adjust the folder path as needed
+      - 'CryptoFunctionApp/**'
+      - ".github/workflows/deploy-functions.yml"
 
 jobs:
   build-and-deploy:
