@@ -19,7 +19,7 @@ variable "location" {
 variable "common_suffix" {
   description = "The common suffix to be used. If not provided, a random string will be used."
   type        = string
-  default     = ""
+  default     = "7h9eax"
 }
 
 variable "auth0_domain" {

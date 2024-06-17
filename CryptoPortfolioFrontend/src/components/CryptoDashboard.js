@@ -44,7 +44,7 @@ const CryptoDashboard = () => {
             const fetchPortfolio = async () => {
                 try {
                     const token = await getAccessTokenSilently();
-                    const response = await fetch(`${config.REACT_APP_API_BASE_URL}/api/portfolio`, {
+                    const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -96,8 +96,8 @@ const CryptoDashboard = () => {
         const existingItem = portfolioData.find(item => item.cryptoName.toLowerCase() === currentCrypto.name.toLowerCase());
         const method = existingItem ? 'PUT' : 'POST';
         const url = existingItem
-            ? `${config.REACT_APP_API_BASE_URL}/api/portfolio/${existingItem.id}`
-            : `${config.REACT_APP_API_BASE_URL}/api/portfolio`;
+            ? `${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio/${existingItem.id}`
+            : `${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`;
 
         const body = JSON.stringify({
             cryptoName: currentCrypto.name,
@@ -116,7 +116,7 @@ const CryptoDashboard = () => {
                 body,
             });
 
-            const response = await fetch(`${config.REACT_APP_API_BASE_URL}/api/portfolio`, {
+            const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -146,14 +146,14 @@ const CryptoDashboard = () => {
         if (!existingItem) return;
 
         try {
-            await fetch(`${config.REACT_APP_API_BASE_URL}/api/portfolio/${existingItem.id}`, {
+            await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio/${existingItem.id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
-            const response = await fetch(`${config.REACT_APP_API_BASE_URL}/api/portfolio`, {
+            const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

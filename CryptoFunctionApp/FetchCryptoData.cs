@@ -18,10 +18,10 @@ namespace CryptoFunctionApp.Functions
         private static readonly string CosmosConnectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
         private static readonly string DatabaseId = "CryptoPortfolioDB";
         private static readonly string ContainerId = "CryptoData";
-        private static readonly int IntervalMinutes = int.TryParse(Environment.GetEnvironmentVariable("IntervalMinutes"), out var interval) ? interval : 15;
+        private static readonly int IntervalMinutes = int.TryParse(Environment.GetEnvironmentVariable("IntervalMinutes"), out var interval) ? interval : 5;
 
         [FunctionName("FetchCryptoData")]
-        public static async Task Run([TimerTrigger("* */15 * * * *")] TimerInfo myTimer, ILogger log)
+        public static async Task Run([TimerTrigger("* */5 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             log.LogInformation($"Interval set to: {IntervalMinutes} minutes");

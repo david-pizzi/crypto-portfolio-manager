@@ -5,6 +5,7 @@ on:
     paths:
       - "CryptoPortfolioFrontend/**"
       - ".github/workflows/deploy-react.yml"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -38,7 +39,7 @@ jobs:
         REACT_APP_AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
         REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
         REACT_APP_AUTH0_SCOPE: ${{ secrets.REACT_APP_AUTH0_SCOPE }}
-        REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
+        REACT_APP_PORTFOLIO_API_BASE_URL: ${{ secrets.REACT_APP_PORTFOLIO_API_BASE_URL }}
         REACT_APP_AZURE_FUNCTION_URL: ${{ secrets.REACT_APP_AZURE_FUNCTION_URL }}
         REACT_APP_AZURE_FUNCTION_CODE: ${{ secrets.REACT_APP_AZURE_FUNCTION_CODE }}
 
@@ -58,6 +59,12 @@ jobs:
       with:
         name: build-artifacts
         path: build
+
+    - name: Clear existing content in $web container
+      uses: azure/cli@v1
+      with:
+        inlineScript: |
+          az storage blob delete-batch -s '$web' --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
 
     - name: Upload to Azure
       uses: azure/cli@v1
