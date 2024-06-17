@@ -69,4 +69,6 @@ jobs:
       uses: azure/cli@v1
       with:
         inlineScript: |
-          az storage blob update-batch --pattern "build/*" --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name '$web' --content-cache-control "no-cache, no-store, must-revalidate" 
+          for file in $(find build -type f); do
+            az storage blob update --container-name '$web' --name "${file#build/}" --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --content-cache-control "no-cache, no-store, must-revalidate"
+          done
