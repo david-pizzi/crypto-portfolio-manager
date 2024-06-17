@@ -18,13 +18,10 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v2
 
-      - name: Set working directory
-        run: cd CryptoPortfolioBackend
-
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "7.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Build the project
         run: dotnet build --configuration Release
