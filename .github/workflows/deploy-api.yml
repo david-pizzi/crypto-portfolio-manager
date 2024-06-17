@@ -1,0 +1,56 @@
+name: Build and Deploy API to Azure
+
+on:
+  push:
+    paths:
+      - "CryptoPortfolioBackend/**"
+      - ".github/workflows/deploy-api.yml"
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: crypto-portfolio
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "7.0.x"
+
+      - name: Build the project
+        run: dotnet build --configuration Release
+
+      - name: Publish the project
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get ACR credentials
+        run: |
+          echo "##[set-output name=USERNAME;]$(az acr credential show --name ${{ secrets.ACR_REGISTRY }} --query username --output tsv)"
+          echo "##[set-output name=PASSWORD;]$(az acr credential show --name ${{ secrets.ACR_REGISTRY }} --query passwords[0].value --output tsv)"
+        id: get-acr-credentials
+
+      - name: Login to Azure Container Registry
+        run: |
+          echo "${{ steps.get-acr-credentials.outputs.PASSWORD }}" | docker login ${{ secrets.ACR_REGISTRY }} -u ${{ steps.get-acr-credentials.outputs.USERNAME }} --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
+          docker push ${{ secrets.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_PORTFOLIO_API_NAME }}
+          images: "${{ secrets.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
