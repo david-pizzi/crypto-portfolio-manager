@@ -26,27 +26,6 @@ jobs:
 
     - name: Build React app
       run: npm run build
-      working-directory: ./CryptoPortfolioFrontend
-      env:
-        NODE_ENV: production
-
-    - name: Replace tokens
-      uses: cschleiden/replace-tokens@v1.3
-      with:
-        files: './CryptoPortfolioFrontend/build/**/*.js'
-      env:
-        REACT_APP_AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
-        REACT_APP_AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
-        REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
-        REACT_APP_AUTH0_SCOPE: ${{ secrets.REACT_APP_AUTH0_SCOPE }}
-<<<<<<< HEAD
-        REACT_APP_AZURE_PORTFOLIO_API_URL: ${{ secrets.AZURE_PORTFOLIO_API_URL }}
-=======
-        REACT_APP_PORTFOLIO_API_BASE_URL: ${{ secrets.REACT_APP_PORTFOLIO_API_BASE_URL }}
->>>>>>> fbeb6a5 (Devops/fix buids (#23))
-        REACT_APP_AZURE_FUNCTION_URL: ${{ secrets.REACT_APP_AZURE_FUNCTION_URL }}
-        REACT_APP_AZURE_FUNCTION_CODE: ${{ secrets.REACT_APP_AZURE_FUNCTION_CODE }}
-
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -79,4 +58,3 @@ jobs:
           
 =======
           az storage blob upload-batch -d '$web' -s build --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
->>>>>>> fbeb6a5 (Devops/fix buids (#23))
