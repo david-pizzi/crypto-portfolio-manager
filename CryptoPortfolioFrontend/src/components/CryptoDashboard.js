@@ -44,11 +44,8 @@ const CryptoDashboard = () => {
             const fetchPortfolio = async () => {
                 try {
                     const token = await getAccessTokenSilently();
-<<<<<<< HEAD
-                    const response = await fetch(`${config.AZURE_PORTFOLIO_API_URL}/api/portfolio`, {
-=======
                     const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
->>>>>>> fbeb6a5 (Devops/fix buids (#23))
+
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -100,13 +97,8 @@ const CryptoDashboard = () => {
         const existingItem = portfolioData.find(item => item.cryptoName.toLowerCase() === currentCrypto.name.toLowerCase());
         const method = existingItem ? 'PUT' : 'POST';
         const url = existingItem
-<<<<<<< HEAD
-            ? `${config.REACT_APP_AZURE_PORTFOLIO_API_URL}/api/portfolio/${existingItem.id}`
-            : `${config.REACT_APP_AZURE_PORTFOLIO_API_URL}/api/portfolio`;
-=======
             ? `${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio/${existingItem.id}`
             : `${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`;
->>>>>>> fbeb6a5 (Devops/fix buids (#23))
 
         const body = JSON.stringify({
             cryptoName: currentCrypto.name,
@@ -125,11 +117,8 @@ const CryptoDashboard = () => {
                 body,
             });
 
-<<<<<<< HEAD
-            const response = await fetch(`${config.REACT_APP_AZURE_PORTFOLIO_API_URL}/api/portfolio`, {
-=======
             const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
->>>>>>> fbeb6a5 (Devops/fix buids (#23))
+
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -159,22 +148,16 @@ const CryptoDashboard = () => {
         if (!existingItem) return;
 
         try {
-<<<<<<< HEAD
-            await fetch(`${config.REACT_APP_AZURE_PORTFOLIO_API_URL}/api/portfolio/${existingItem.id}`, {
-=======
             await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio/${existingItem.id}`, {
->>>>>>> fbeb6a5 (Devops/fix buids (#23))
+
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
-<<<<<<< HEAD
-            const response = await fetch(`${config.REACT_APP_AZURE_PORTFOLIO_API_URL}/api/portfolio`, {
-=======
             const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
->>>>>>> fbeb6a5 (Devops/fix buids (#23))
+
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
