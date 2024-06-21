@@ -45,6 +45,7 @@ const CryptoDashboard = () => {
                 try {
                     const token = await getAccessTokenSilently();
                     const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
+
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -117,6 +118,7 @@ const CryptoDashboard = () => {
             });
 
             const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
+
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -147,6 +149,7 @@ const CryptoDashboard = () => {
 
         try {
             await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio/${existingItem.id}`, {
+
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -154,6 +157,7 @@ const CryptoDashboard = () => {
             });
 
             const response = await fetch(`${config.REACT_APP_PORTFOLIO_API_BASE_URL}/api/portfolio`, {
+
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
