@@ -7,7 +7,7 @@ variable "branch" {
 variable "resource_group_name" {
   description = "The name of the resource group"
   type        = string
-  default     = "crypto-portfolio-rg"
+  default     = "crypto-portfolio"
 }
 
 variable "location" {
